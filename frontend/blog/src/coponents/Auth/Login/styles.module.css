@@ -68,6 +68,12 @@
   text-align: center;
   cursor: pointer;
   font-weight: 500;
+  transition: 0.3s;
+}
+
+.button:hover{
+  background-color: #47702a;
+  transition: 0.3s;
 }
 
 .or {

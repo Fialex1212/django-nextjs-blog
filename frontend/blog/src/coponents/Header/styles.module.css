@@ -1,0 +1,22 @@
+.header{
+    padding: 30px 0;
+}
+
+.nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav__title{
+    font-size: 32px;
+}
+
+.nav__link{
+    text-decoration: none;
+}
+
+.nav__list{
+    display: flex;
+}
+
