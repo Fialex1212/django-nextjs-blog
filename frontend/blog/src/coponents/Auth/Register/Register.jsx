@@ -187,7 +187,7 @@ const Register = () => {
             <p className={css.register}>
               Have an account?{" "}
               <span className={css.register__link}>
-                <Link className={css.register__link} href={"/auth/register"}>
+                <Link className={css.register__link} href={"/auth/login"}>
                   Login
                 </Link>
               </span>

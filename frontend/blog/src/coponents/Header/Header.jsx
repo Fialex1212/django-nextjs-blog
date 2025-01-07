@@ -1,8 +1,15 @@
+"use client";
+
 import React from "react";
 import css from "./styles.module.css";
 import Link from "next/link";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const Header = () => {
+  const { isAuthenticated } = useAuthStore();
+
+  console.log(isAuthenticated);
+
   return (
     <header className={css.header}>
       <div className="container">
@@ -13,11 +20,30 @@ const Header = () => {
             </Link>
           </h2>
           <ul className={css.nav__list}>
-            <li className={css.nav__item}>
-              <Link href={"/profile"} className={css.nav__link}>
-                Profile
-              </Link>
-            </li>
+            {isAuthenticated ? (
+              <>
+                {" "}
+                <li className={css.nav__item}>
+                  <Link href={"/profile"} className={css.nav__link}>
+                    Profile
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className={css.nav__item}>
+                  <Link href={"/auth/login"} className={css.nav__link}>
+                    Login
+                  </Link>
+                </li>
+                /
+                <li className={css.nav__item}>
+                  <Link href={"/auth/register"} className={css.nav__link}>
+                    Register
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>

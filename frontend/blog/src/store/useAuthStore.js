@@ -1,13 +1,10 @@
 import { create } from "zustand";
 import axios from "axios";
+import api from "@/utils/api";
 
 export const useAuthStore = create((set) => {
-  const storedUser = localStorage.getItem("userData");
-  const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-
   return {
-    user: parsedUser,
-    isAuthenticated: parsedUser !== null,
+    isAuthenticated: false,
     isLoading: false,
     isPopup: false,
     setIsPopup: (value) =>
@@ -23,12 +20,14 @@ export const useAuthStore = create((set) => {
             withCredentials: true,
           }
         );
+        const { access_token, refresh_token } = response.data;
+        set({
+          isAuthenticated: true,
+        });
+        document.cookie = `access_token=${access_token}; path=/;`;
+        document.cookie = `refresh_token=${refresh_token}; path=/;`;
+        console.log('Login successful:', response.data);
         console.log(response.data);
-        const { user } = response.data;
-        if (user) {
-          localStorage.setItem("userData", JSON.stringify(user));
-          set({ user, isAuthenticated: true });
-        }
       } catch (error) {
         throw error;
       }
@@ -38,8 +37,6 @@ export const useAuthStore = create((set) => {
         await axios.post("http://127.0.0.1:8000/api/auth/logout/", null, {
           withCredentials: true,
         });
-        localStorage.removeItem("userData");
-        set({ user: null, isAuthenticated: false });
         console.log(response.data);
       } catch (error) {
         throw error;
@@ -72,6 +69,18 @@ export const useAuthStore = create((set) => {
         throw error;
       } finally {
         set({ isLoading: false });
+      }
+    },
+    checkAuthStatus: async () => {
+      try {
+        const response = await api.get('/auth/check-auth-status/', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const data = await response.json();
+        set({ isAuthenticated: data.is_authenticated });
+      } catch (error) {
+        console.error("Error checking authentication status:", error);
       }
     },
   };

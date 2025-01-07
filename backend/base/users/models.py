@@ -1,4 +1,5 @@
 import uuid
+from django.utils.text import slugify
 from django.utils.timezone import now
 from datetime import timedelta
 from django.utils import timezone
@@ -30,10 +31,14 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
     
+def get_avatar_upload_to(instance, filename):
+    return f'avatars/{slugify(instance.fullname)}/{filename}'
+    
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(blank=True, unique=True)
     fullname = models.CharField(blank=True, max_length=255)
+    photo = models.ImageField(upload_to=get_avatar_upload_to, null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

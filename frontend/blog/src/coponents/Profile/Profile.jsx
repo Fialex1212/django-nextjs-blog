@@ -12,7 +12,10 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/auth/profile/");
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/auth/profile/",
+        { withCredentials: true }
+      );
       setProfile(response.data);
     } catch (error) {
       setError("An error occurred while fetching profile data.");

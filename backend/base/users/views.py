@@ -89,13 +89,11 @@ class LoginView(APIView):
 
         response = Response({
             'message': 'Login successful.',
-        }, status=status.HTTP_200_OK)
-        expires = datetime.datetime.now() + timedelta(days=1)
-        response.set_cookie('refresh_token', str(refresh), httponly=True, secure=False, samesite='Lax', expires=expires)
-        response.set_cookie('access_token', str(access), httponly=True, secure=False, samesite='Lax', expires=expires)
+            'access_token': str(access),
+            'refresh_token': str(refresh),
+        }, status=status.HTTP_200_OK)   
 
         return response
-        
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]

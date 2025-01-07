@@ -6,7 +6,13 @@ import Tag from "@/coponents/Tag/Tag";
 const PostCard = ({ item }) => {
   return (
     <div className={css.post}>
-      <Image src={item.image} alt={item.title} width={326} height={228} />
+      <div className={css.post__header}>
+        <Image src={item.author.photo} alt={item.author.fullname} width={40} height={40}/>
+        <p>{item.author.fullname}</p>
+      </div>
+      <div className={css.post__content}></div>
+      <div className={css.post__footer}></div>
+      <Image src={item.photo} alt={item.text} width={200} height={200} />
       <time dateTime={item.created_at}>
         {new Date(item.created_at).toLocaleDateString("en-US", {
           year: "numeric",
@@ -14,15 +20,8 @@ const PostCard = ({ item }) => {
           month: "long",
         })}
       </time>
-      <h4>{item.title}</h4>
-      <p>{item.description}</p>
-      <ul className={css.tags__list}>
-        {item.tags.map((tag, index) => (
-          <li key={index}>
-            <Tag tag={tag} />
-          </li>
-        ))}
-      </ul> 
+      <h4>{item.author.email}</h4>
+      <p>{item.text}</p>
     </div>
   );
 };

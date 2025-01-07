@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     #libraries
     'rest_framework',
     'corsheaders',
+    'django_extensions',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -100,7 +101,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #MEDIA
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #JWT
@@ -124,6 +124,9 @@ SIMPLE_JWT = {
 #CORS
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
@@ -158,3 +161,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'alexkilan940@gmail.com'
 EMAIL_HOST_PASSWORD = 'csxk odnu ryac vyuj'
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
