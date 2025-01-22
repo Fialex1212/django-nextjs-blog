@@ -9,7 +9,9 @@ const nextConfig = {
   },
   images: {
     domains: ['127.0.0.1', 'localhost'],
-  }
+    unoptimized: true,
+  },
+  
 };
 
 export default nextConfig;

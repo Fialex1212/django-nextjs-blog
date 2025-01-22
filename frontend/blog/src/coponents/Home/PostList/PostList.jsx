@@ -10,6 +10,9 @@ const PostList = () => {
   const { posts, fetchPosts } = usePostsStore();
   const { checkAuthStatus } = useAuthStore();
 
+  console.log(posts);
+  
+
   useEffect(() => {
     fetchPosts();
     checkAuthStatus();

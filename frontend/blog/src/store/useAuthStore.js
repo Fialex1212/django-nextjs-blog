@@ -73,11 +73,10 @@ export const useAuthStore = create((set) => {
     },
     checkAuthStatus: async () => {
       try {
-        const response = await api.get('/auth/check-auth-status/', {
-          method: 'GET',
-          credentials: 'include',
+        const response = await axios.get("http://127.0.0.1:8000/api/auth/check-auth-status/", {
+          withCredentials: true,
         });
-        const data = await response.json();
+        const data = response.data;
         set({ isAuthenticated: data.is_authenticated });
       } catch (error) {
         console.error("Error checking authentication status:", error);
