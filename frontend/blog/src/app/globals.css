@@ -1,7 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   padding: 0px;
   margin: 0px;
-  border: none;
 }
 
 *,
@@ -91,41 +94,4 @@ label {
 
 legend {
   display: block;
-}
-
-:root {
-  --fz-xxsmall: 10px;
-  --fz-xssmall: 12px;
-  --fz-ssmall: 14px;
-  --fz-small: 16px;
-  --fz-medium: 18px;
-  --fz-large: 20px;
-  --fz-xlarge: 24px;
-  --fz-xxlarge: 28px;
-  --fz-xxxlarge: 32px;
-  --fz-xxxlarge: 36px;
-  --fz-4xl: 48px;
-  --fz-5xl: 72px;
-
-}
-
-@media screen and (min-width: 992px) {
-
-}
-
-.container {
-  max-width: 100%;
-  width: 1240px;
-  padding: 0 20px;
-  margin: 0 auto;
-}
-
-body {
-  font-family: "Poppins";
-  color: #000;
-  background: #fff;
-}
-
-main {
-  min-height: 50vh;
 }

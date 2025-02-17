@@ -1,25 +1,20 @@
-from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from .models import CustomUser
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
 
-class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    
-    class Meta:
-        model = CustomUser
-        fields = ['email', 'password']
-        
-    def create(self, validate_data):
-        user = CustomUser(
-            email = validate_data['email'],
-        )
-        user.set_password(validate_data['password'])
-        user.save()
-        return user
-    
+User = get_user_model()
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['id',  'email',  'fullname', 'photo']
+        model = User
+        fields = ['id', 'username', 'email']
 
-        
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+    
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
