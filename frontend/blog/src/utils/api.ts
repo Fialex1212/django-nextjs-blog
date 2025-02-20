@@ -70,10 +70,10 @@ export async function getPosts() {
   }
 }
 
-export async function createPost(token, data) {
+export async function createPost(token: string, data: FormData) {
   try {
     const res = await axios.post(
-      `${API_URL}/blog/posts/create/`,
+      `${API_URL}/blog/posts/`,
       data,
       {
         headers: {
@@ -89,6 +89,22 @@ export async function createPost(token, data) {
       toast.error(errorMessage);
     } else {
       toast.error("Failed while creating a post");
+    }
+  }
+}
+
+export async function getUserDetail(username: string) {
+  try {
+    const res = await axios.get(`${API_URL}/auth/user_detail/?username=${username}`, {
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.error || "Failed to fetch user data";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Failed to fetch user data");
     }
   }
 }

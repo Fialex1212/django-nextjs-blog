@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import Modal from "react-modal";
 
 interface Author {
   id: string;
@@ -21,22 +23,36 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ item }) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
   const authorPhoto = item.author.photo
     ? item.author.photo
     : `https://ui-avatars.com/api/?name=${item.author.username}&size=40`;
 
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
     <div className="post">
-      <div className="post-header">
-        <div className="author-info">
-          <Image
-            src={authorPhoto}
-            alt={item.author.username}
-            width={40}
-            height={40}
-            className="author-photo"
-          />
-          <p className="author-name">{item.author.username}</p>
+      <div className="post-header flex items-center gap-[20px] mb-[10px]">
+        <div className="author-info flex items-center gap-[20px]">
+          <Link href={`/profile/${item.author.username}`}>
+            <Image
+              src={authorPhoto}
+              alt={item.author.username}
+              width={40}
+              height={40}
+              className="author-photo"
+            />
+          </Link>
+          <Link href={`/profile/${item.author.username}`}>
+            {item.author.username}
+          </Link>
         </div>
         <time dateTime={item.created_at} className="post-date">
           {new Date(item.created_at).toLocaleDateString("en-US", {
@@ -46,19 +62,65 @@ const Post: React.FC<PostProps> = ({ item }) => {
           })}
         </time>
       </div>
-
-      {item.photo && (
+      <div className="image__wrapper" onClick={openModal}>
+        {item.photo && (
           <Image
             src={item.photo}
             alt={item.text}
-            width={200}
-            height={200}
+            width={300}
+            height={300}
             className="post-photo"
           />
-      )}
-
+        )}
+      </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Create Post Modal"
+        ariaHideApp={false}
+      >
+        <button className="close" onClick={closeModal}></button>
+        <div className="post">
+          <div className="post-header flex items-center gap-[20px] mb-[10px]">
+            <div className="author-info flex items-center gap-[20px]">
+              <Link href={`/profile/${item.author.username}`}>
+                <Image
+                  src={authorPhoto}
+                  alt={item.author.username}
+                  width={40}
+                  height={40}
+                  className="author-photo"
+                />
+              </Link>
+              <Link href={`/profile/${item.author.username}`}>
+                {item.author.username}
+              </Link>
+            </div>
+            <time dateTime={item.created_at} className="post-date">
+              {new Date(item.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                day: "numeric",
+                month: "long",
+              })}
+            </time>
+          </div>
+          <div className="image__wrapper" onClick={openModal}>
+            {item.photo && (
+              <Image
+                src={item.photo}
+                alt={item.text}
+                width={300}
+                height={300}
+                className="post-photo"
+              />
+            )}
+          </div>
+          <div className="post-content">
+            <p className="post-text">{item.text}</p>
+          </div>
+        </div>
+      </Modal>
       <div className="post-content">
-        <h4 className="author-email">{item.author.email}</h4>
         <p className="post-text">{item.text}</p>
       </div>
     </div>

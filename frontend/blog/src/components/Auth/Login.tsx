@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { loginUser, getUser } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { toast } from "sonner";
 
 const Login = () => {
@@ -11,14 +11,14 @@ const Login = () => {
   const { login } = useAuthStore();
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const data = await loginUser(username, password);
       const user = await getUser(data.access);
       login(data.access, user);
-      router.push("/profile");
-    } catch (error) {
+      router.push("/");
+    } catch {
       toast.error("Error");
     }
   };

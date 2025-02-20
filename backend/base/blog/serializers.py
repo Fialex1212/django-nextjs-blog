@@ -17,6 +17,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'author', 'text', 'photo', 'created_at', 'updated_at', 'comments']
+        read_only_fields = ['author', 'created_at', 'updated_at', 'comments']  # Ensure these fields are read-only
 
     def create(self, validated_data):
+        # Remove 'author' from validated_data if it exists
+        validated_data.pop('author', None)
         return Post.objects.create(author=self.context['request'].user, **validated_data)

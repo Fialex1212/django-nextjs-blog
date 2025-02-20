@@ -2,11 +2,13 @@ from rest_framework import viewsets
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    @action(detail=False, methods=["post"])
     def perform_create(self, serializer):
         print(self.request.headers)
         serializer.save(author=self.request.user)

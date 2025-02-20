@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.viewsets import ViewSet
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.decorators import action
+from .models import CustomUser
+from django.shortcuts import get_object_or_404
 
 
 def get_tokens_for_user(user):
@@ -41,3 +43,17 @@ class AuthViewSet(ViewSet):
     @permission_classes([IsAuthenticated])
     def me(self, request):
         return Response(UserSerializer(request.user).data)
+
+    @action(detail=False, methods=["get"])
+    def user_detail(self, request):
+
+        username = request.query_params.get("username")
+        if not username:
+            return Response(
+                {"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        user = get_object_or_404(CustomUser, username=username)
+        if user:
+            serializer = UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"error": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
