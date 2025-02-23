@@ -24,7 +24,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-232px)]">
       <h2 className="text-2xl mb-20 text-[50px]">Login to you account</h2>
       <form className="flex flex-col gap-[50px]" onSubmit={handleLogin}>
         <label className="relative block">

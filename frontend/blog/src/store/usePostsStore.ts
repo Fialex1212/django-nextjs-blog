@@ -20,27 +20,36 @@ interface PostState {
   posts: Post[];
   loading: boolean;
   error: string | null;
+  page: number;
   fetchPosts: () => Promise<void>;
 }
 
-export const usePostsStore = create<PostState>((set) => {
-  return {
-    posts: [],
-    loading: false,
-    error: null,
-    fetchPosts: async () => {
-      set({ loading: true, error: null });
-      try {
-        const postsData = await getPosts();
-        set({ posts: postsData, loading: false });
-      } catch (error) {
-        console.log("Error while fething", error);
-        if (error instanceof Error) {
-          set({ loading: false, error: error.message });
-        } else {
-          set({ loading: false, error: "An unknown error occurred" });
-        }
+export const usePostsStore = create<PostState>((set) => ({
+  posts: [],
+  loading: false,
+  error: null,
+  page: 1,
+  fetchPosts: async (limit: number = 10, page: number = 1) => {
+    set({ loading: true, error: null });
+    try {
+      const postsData = await getPosts(limit, page);
+      console.log("Posts data in store:", postsData);
+      if (postsData && postsData.results) {
+        set((state) => ({
+          posts: postsData.results,
+          loading: false,
+          page: page + 1,
+        }));
+      } else {
+        set({ loading: false });
       }
-    },
-  };
-});
+    } catch (error) {
+      console.log("Error while fetching", error);
+      if (error instanceof Error) {
+        set({ loading: false, error: error.message });
+      } else {
+        set({ loading: false, error: "An unknown error occurred" });
+      }
+    }
+  },
+}));

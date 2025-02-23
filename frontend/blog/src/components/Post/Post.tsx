@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Modal from "react-modal";
+import { likePost } from "@/utils/api";
+import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "sonner";
 
 interface Author {
   id: string;
@@ -16,6 +19,8 @@ interface PostItem {
   text: string;
   photo: string;
   created_at: string;
+  count_likes: number; 
+  is_liked: boolean; 
 }
 
 interface PostProps {
@@ -23,6 +28,9 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ item }) => {
+  const { token } = useAuthStore();
+  const [likes, setLikes] = useState<number>(Number(item.count_likes) || 0);
+  const [liked, setLiked] = useState<boolean>(item.is_liked || false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const authorPhoto = item.author.photo
@@ -35,6 +43,21 @@ const Post: React.FC<PostProps> = ({ item }) => {
 
   const closeModal = () => {
     setModalIsOpen(false);
+  };
+
+  const handleLike = async () => {
+    try {
+      const response = await likePost(token, item.id);
+      if (response.message === "Post liked") {
+        setLiked(true);
+        setLikes((prev) => prev + 1);
+      } else if (response.message === "Like removed") {
+        setLiked(false);
+        setLikes((prev) => prev - 1);
+      }
+    } catch {
+      toast.error("Failed to like a post");
+    }
   };
 
   return (
@@ -76,7 +99,7 @@ const Post: React.FC<PostProps> = ({ item }) => {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Create Post Modal"
+        contentLabel="Post detail"
         ariaHideApp={false}
       >
         <button className="close" onClick={closeModal}></button>
@@ -122,6 +145,9 @@ const Post: React.FC<PostProps> = ({ item }) => {
       </Modal>
       <div className="post-content">
         <p className="post-text">{item.text}</p>
+        <button onClick={handleLike}>
+          {liked ? "❤️" : "👍"} {likes}
+        </button>
       </div>
     </div>
   );

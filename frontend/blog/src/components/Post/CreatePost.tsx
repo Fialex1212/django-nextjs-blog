@@ -114,6 +114,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ modalIsOpen, setIsOpen }) => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Create Post Modal"
+        ariaHideApp={false}
       >
         <button className="close" onClick={closeModal}></button>
         <form onSubmit={handleSubmit}>

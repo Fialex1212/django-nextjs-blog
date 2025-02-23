@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { registerUser } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -10,17 +10,17 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleRegister = async (e) => {
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await registerUser(username, email, password);
       router.push("/login");
-    } catch (error) {
+    } catch {
       toast.error("Error");
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-232px)]">
       <h2 className="text-2xl mb-20 text-[50px]">Create a new account</h2>
       <form className="flex flex-col gap-[50px]" onSubmit={handleRegister}>
         <label className="relative block">
@@ -97,10 +97,7 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
-        <button
-          className="mt-4 p-2 bg-green-500 text-white"
-          onClick={handleRegister}
-        >
+        <button className="mt-4 p-2 bg-green-500 text-white" type="submit">
           Register
         </button>
       </form>

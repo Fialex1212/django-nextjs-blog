@@ -61,26 +61,47 @@ export async function getUser(token: string) {
   }
 }
 
-export async function getPosts() {
+export async function getUserDetail(username: string) {
   try {
-    const res = await axios.get(`${API_URL}/blog/posts/`, {});
+    const res = await axios.get(
+      `${API_URL}/auth/user_detail/?username=${username}`,
+      {}
+    );
     return res.data;
   } catch (error) {
-    console.log(error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.error || "Failed to fetch user data";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Failed to fetch user data");
+    }
+  }
+}
+
+export async function getPosts(limit = 10, page = 1) {
+  try {
+    const res = await axios.get(`${API_URL}/blog/posts/`, {
+      params: {
+        limit,
+        page,
+      },
+    });
+    console.log("Fetched posts:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return null;
   }
 }
 
 export async function createPost(token: string, data: FormData) {
   try {
-    const res = await axios.post(
-      `${API_URL}/blog/posts/`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.post(`${API_URL}/blog/posts/`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -93,18 +114,30 @@ export async function createPost(token: string, data: FormData) {
   }
 }
 
-export async function getUserDetail(username: string) {
+export async function likePost(token: string, id: string) {
   try {
-    const res = await axios.get(`${API_URL}/auth/user_detail/?username=${username}`, {
-    });
-    return res.data;
+    const request = await axios.post(
+      `${API_URL}/blog/posts/${id}/like/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return request.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage =
-        error.response?.data?.error || "Failed to fetch user data";
-      toast.error(errorMessage);
+        error.response?.data?.error || "Failed to like a post";
+      if (error.response?.status === 401) {
+        console.log("Unauthorized! Please log in.");
+        toast.error("Unauthorized! Please log in.");
+      } else {
+        console.log(errorMessage);
+      }
     } else {
-      toast.error("Failed to fetch user data");
+      console.log("Failed to like a post", error);
     }
   }
 }

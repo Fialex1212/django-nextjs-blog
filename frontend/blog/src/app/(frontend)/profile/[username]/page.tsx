@@ -1,3 +1,5 @@
+"use client"
+
 import ProfileByUsername from "@/components/Profile/ProfileByUsername";
 
 export default function ProfilePageByUsername({
