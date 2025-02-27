@@ -15,7 +15,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     comments = CommentSerializer(read_only=True, many=True)
-    count_likes = serializers.SerializerMethodField() 
+    count_likes = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
 
     class Meta:
@@ -33,14 +33,15 @@ class PostSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "author", "created_at"]
 
-    #func for get a boolean value if my request.user liked this post to display is liked icon
+    # func for get a boolean value if my request.user liked this post to display is liked icon
     def get_is_liked(self, obj):
         user = self.context.get("request").user
-        if not user.is_authenticated:
+        request = self.context.get("request")
+        if not request or not user.is_authenticated:
             return False
         return obj.post_likes.filter(user=user).exists()
 
-    #func for get a number of total likes
+    # func for get a number of total likes
     def get_count_likes(self, obj):
         return obj.count_likes
 

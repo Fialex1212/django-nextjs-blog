@@ -1,105 +1,110 @@
 "use client";
-import { useState, FormEvent } from "react";
 import { registerUser } from "@/utils/api";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 
 const Register = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    getValues,
+  } = useForm();
   const router = useRouter();
 
-  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: FieldValues) => {
+    console.log(data.username, data.email, data.password);
     try {
-      await registerUser(username, email, password);
+      await registerUser(data.username, data.email, data.password);
       router.push("/login");
     } catch {
       toast.error("Error");
     }
+    reset();
   };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-232px)]">
       <h2 className="text-2xl mb-20 text-[50px]">Create a new account</h2>
-      <form className="flex flex-col gap-[50px]" onSubmit={handleRegister}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-[50px] max-w-[400px] w-full"
+      >
         <label className="relative block">
-          <span className="absolute left-2 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </span>
           <input
-            className="pl-8 border-b border-black-500 border-style: dashed"
-            value={username}
-            required
+            {...register("username", {
+              required: "Username is required",
+            })}
+            className="border-b border-black-500 border-style: dashed w-full"
             placeholder="Username"
-            onChange={(e) => setUsername(e.target.value)}
           />
+          {errors.username && (
+            <p className="text-red-500">{`${errors.username.message}`}</p>
+          )}
         </label>
         <label className="relative block">
-          <span className="absolute left-2 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-            </svg>
-          </span>
           <input
+            {...register("email", { required: "Email is required" })}
             type="email"
-            className="pl-8 border-b border-black-500 border-style: dashed w-full"
-            value={email}
+            className="border-b border-black-500 border-style: dashed w-full"
             required
             placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
           />
+          {errors.email && (
+            <p className="text-red-500">{`${errors.email.message}`}</p>
+          )}
         </label>
         <label className="relative block">
-          <span className="cursor-auto absolute left-2 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                clipRule="evenodd"
-              />
-              <path
-                fillRule="evenodd"
-                d="M4 8V6a6 6 0 1112 0v2h1a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1h1zm2-2v2h8V6a4 4 0 00-8 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </span>
-
           <input
-            className="pl-8 border-b border-black-500 border-style: dashed"
-            value={password}
+            {...register("password", {
+              required: "Username is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
+            })}
+            className="border-b border-black-500 border-style: dashed w-full"
             required
             type="password"
             placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
           />
+          {errors.password && (
+            <p className="text-red-500">{`${errors.password.message}`}</p>
+          )}
         </label>
-        <button className="mt-4 p-2 bg-green-500 text-white" type="submit">
+        <label className="relative block">
+          <input
+            {...register("confirmPassword", {
+              required: "Confirm password is required",
+              validate: (value) =>
+                value === getValues("password") || "Password must match",
+            })}
+            className="border-b border-black-500 border-style: dashed w-full"
+            required
+            type="password"
+            placeholder="Password"
+          />
+          {errors.confirmPassword && (
+            <p className="text-red-500">{`${errors.confirmPassword.message}`}</p>
+          )}
+        </label>
+
+        <button
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-6 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+          type="submit"
+        >
           Register
         </button>
+        <div className="flex justify-center gap-[10px] font-semibold">
+          <p>Already have an account?</p>
+          <Link className="text-blue-600 underline" href={"/login"}>
+            Login
+          </Link>
+        </div>
       </form>
     </div>
   );

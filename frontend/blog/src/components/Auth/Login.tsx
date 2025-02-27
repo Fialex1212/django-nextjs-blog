@@ -2,88 +2,81 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { loginUser, getUser } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import { useState, FormEvent } from "react";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
+import Link from "next/link";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const { login } = useAuthStore();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
   const router = useRouter();
+  const { login } = useAuthStore();
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: FieldValues) => {
+    console.log(data.username, data.password);
     try {
-      const data = await loginUser(username, password);
-      const user = await getUser(data.access);
+      const userData = await loginUser(data.username, data.password);
+      const user = await getUser(userData.access);
       login(data.access, user);
       router.push("/");
     } catch {
       toast.error("Error");
     }
+    reset();
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-232px)]">
       <h2 className="text-2xl mb-20 text-[50px]">Login to you account</h2>
-      <form className="flex flex-col gap-[50px]" onSubmit={handleLogin}>
+      <form
+        className="flex flex-col gap-[50px] max-w-[400px] w-full"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <label className="relative block">
-          <span className="absolute left-2 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </span>
           <input
-            className="pl-8 border-b border-black-500 border-style: dashed"
+            {...register("username", { required: "Username is required" })}
+            className="border-b border-black-500 border-style: dashed w-full"
             type="text"
-            value={username}
             placeholder="Username"
-            onChange={(e) => setUsername(e.target.value)}
-            required
           />
+          {errors.username && (
+            <p className="text-red-500">{`${errors.username.message}`}</p>
+          )}
         </label>
         <label className="relative block">
-          <span className="cursor-auto absolute left-2 top-1/2 transform -translate-y-1/2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                clipRule="evenodd"
-              />
-              <path
-                fillRule="evenodd"
-                d="M4 8V6a6 6 0 1112 0v2h1a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V9a1 1 0 011-1h1zm2-2v2h8V6a4 4 0 00-8 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </span>
-
           <input
-            className="pl-8 border-b border-black-500 border-style: dashed"
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 8,
+                message: "Password must be at least 8 characters",
+              },
+            })}
+            className="border-b border-black-500 border-style: dashed w-full"
             type="password"
-            value={password}
             placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            required
           />
+          {errors.password && (
+            <p className="text-red-500">{`${errors.password.message}`}</p>
+          )}
         </label>
-        <button className="mt-4 p-2 bg-green-500 text-white" type="submit">
-          Login
+        <button
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-6 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+          type="submit"
+        >
+          Register
         </button>
+        <div className="flex justify-center gap-[10px] font-semibold">
+          <p>Do not have an account?</p>
+          <Link className="text-blue-600 underline" href={"/register"}>
+            Register
+          </Link>
+        </div>
       </form>
     </div>
   );

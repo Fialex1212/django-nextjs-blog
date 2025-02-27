@@ -1,4 +1,5 @@
 from rest_framework import viewsets, status
+from rest_framework import filters
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.permissions import AllowAny
@@ -18,6 +19,8 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = PostPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ["text"]
 
     @action(detail=False, methods=["post"])
     def perform_create(self, serializer):

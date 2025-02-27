@@ -18,7 +18,8 @@ export async function registerUser(
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || "Registration failed";
-      toast.error(errorMessage);
+      console.log(errorMessage);
+      toast.error("Registration failed");
     } else {
       toast.error("Registration failed");
     }
@@ -35,7 +36,8 @@ export async function loginUser(username: string, password: string) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || "Invalid credentials";
-      toast.error(errorMessage);
+      console.log(errorMessage);
+      toast.error("Invalid credentials");
     } else {
       toast.error("Invalid credentials");
     }
@@ -54,7 +56,8 @@ export async function getUser(token: string) {
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error.response?.data?.error || "Failed to fetch user data";
-      toast.error(errorMessage);
+      console.log(errorMessage);
+      toast.error("Failed to fetch user data");
     } else {
       toast.error("Failed to fetch user data");
     }
@@ -72,7 +75,8 @@ export async function getUserDetail(username: string) {
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error.response?.data?.error || "Failed to fetch user data";
-      toast.error(errorMessage);
+      console.log(errorMessage);
+      toast.error("Failed to fetch user data");
     } else {
       toast.error("Failed to fetch user data");
     }
@@ -95,6 +99,17 @@ export async function getPosts(limit = 10, page = 1) {
   }
 }
 
+export async function getPost(id: string) {
+  try {
+    const res = await axios.get(`${API_URL}/blog/posts/${id}/`, {});
+    console.log("Fetched posts:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return null;
+  }
+}
+
 export async function createPost(token: string, data: FormData) {
   try {
     const res = await axios.post(`${API_URL}/blog/posts/`, data, {
@@ -106,10 +121,17 @@ export async function createPost(token: string, data: FormData) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage =
-        error.response?.data?.error || "Failed while creating a post";
-      toast.error(errorMessage);
+        error?.response?.data?.error ||
+        error?.message ||
+        "An unexpected error occurred while creating the post. Please try again later.";
+      console.log(errorMessage);
+      toast.error(
+        "An unexpected error occurred while creating the post. Please try again later"
+      );
     } else {
-      toast.error("Failed while creating a post");
+      toast.error(
+        "An unexpected error occurred while creating the post. Please try again later"
+      );
     }
   }
 }
@@ -139,5 +161,15 @@ export async function likePost(token: string, id: string) {
     } else {
       console.log("Failed to like a post", error);
     }
+  }
+}
+
+export async function searchQuery(query: string) {
+  try {
+    const request = await axios.get(`${API_URL}/search/?search=${query}`, {});
+    console.log(request.data);
+    return request.data;
+  } catch (error) {
+    console.log("Failed to search", error);
   }
 }

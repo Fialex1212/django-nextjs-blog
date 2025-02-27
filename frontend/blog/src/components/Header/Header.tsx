@@ -3,6 +3,8 @@ import Link from "next/link";
 import CreatePost from "../Post/CreatePost";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import SearchBar from "../SearchBar/SearchBar";
+import { searchQuery } from "@/utils/api";
 
 const Header = () => {
   const { user } = useAuthStore();
@@ -17,6 +19,7 @@ const Header = () => {
         <Link className="text-[32px]" href={"/"}>
           My Blog
         </Link>
+        <SearchBar/>
         {user ? (
           <div className="user__interface flex gap-[40px]">
             <CreatePost modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} />

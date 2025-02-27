@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework import filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
@@ -20,6 +21,9 @@ def get_tokens_for_user(user):
 
 
 class AuthViewSet(ViewSet):
+    filter_backends = filters.SearchFilter
+    search_fields = ["username"]
+
     @action(detail=False, methods=["post"])
     def register(self, request):
         serializer = RegisterSerializer(data=request.data)

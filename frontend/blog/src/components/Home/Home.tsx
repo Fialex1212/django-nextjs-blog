@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { usePostsStore } from "@/store/usePostsStore";
-import Post from "../Post/Post";
+import PostItem from "../Post/PostItem";
 
 const Home = () => {
   const { posts, loading, error, page, fetchPosts } = usePostsStore();
@@ -48,7 +48,7 @@ const Home = () => {
           {posts && posts.length > 0 ? (
             posts.map((post, index) => (
               <li className="w-full" key={index}>
-                <Post item={post} />
+                <PostItem item={post} />
               </li>
             ))
           ) : (
