@@ -7,6 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .models import Post, PostLike
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 class PostPagination(PageNumberPagination):
@@ -22,12 +24,18 @@ class PostViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ["text"]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
     @action(detail=False, methods=["post"])
     def perform_create(self, serializer):
         print(self.request.headers)
         serializer.save(author=self.request.user)
 
     @action(detail=True, methods=["post"])
+    @permission_classes([IsAuthenticated])
     def like(self, request, pk=None):
         user = request.user
         if not user.is_authenticated:
@@ -48,7 +56,13 @@ class PostViewSet(viewsets.ModelViewSet):
             like.delete()
             return Response({"message": "Like removed"}, status=status.HTTP_200_OK)
 
-        return Response({"message": "Post liked"}, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "message": "Post liked",
+                "post": PostSerializer(post, context={"request": request}).data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):

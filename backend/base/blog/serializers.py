@@ -35,11 +35,17 @@ class PostSerializer(serializers.ModelSerializer):
 
     # func for get a boolean value if my request.user liked this post to display is liked icon
     def get_is_liked(self, obj):
-        user = self.context.get("request").user
         request = self.context.get("request")
-        if not request or not user.is_authenticated:
+        if not request:
+            print("Request is None")
             return False
-        return obj.post_likes.filter(user=user).exists()
+        user = self.context.get("request").user #error user is 401 but token is okay 
+        if not user.is_authenticated:
+            print("User is not authenticated")
+            return False
+        liked = obj.post_likes.filter(user=user).exists()
+        print(f"User {user} liked post {obj.id}: {liked}")
+        return liked
 
     # func for get a number of total likes
     def get_count_likes(self, obj):

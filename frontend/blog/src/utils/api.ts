@@ -3,13 +3,64 @@ import { toast } from "sonner";
 
 const API_URL = "http://127.0.0.1:8000/api";
 
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+api.interceptors.response.use(
+  (response) => response, // Directly return successful responses.
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+
+      try {
+        const refreshToken = localStorage.getItem("refreshToken"); // Retrieve the stored refresh token.
+        if (!refreshToken) {
+          throw new Error("No refresh token found.");
+        }
+
+        // Make a request to your auth server to refresh the token.
+        const response = await axios.post(`${API_URL}/auth/token/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+        // Store the new access and refresh tokens.
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+
+        // Update the authorization header with the new access token.
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+
+        return api(originalRequest); // Retry the original request with the new access token.
+      } catch (refreshError) {
+        // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
+        console.error("Token refresh failed:", refreshError);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error); // For all other errors, return the error as is.
+  }
+);
+
 export async function registerUser(
   username: string,
   email: string,
   password: string
 ) {
   try {
-    const res = await axios.post(`${API_URL}/auth/register/`, {
+    const res = await api.post(`/auth/register/`, {
       username,
       email,
       password,
@@ -28,7 +79,7 @@ export async function registerUser(
 
 export async function loginUser(username: string, password: string) {
   try {
-    const res = await axios.post(`${API_URL}/auth/login/`, {
+    const res = await api.post(`/auth/login/`, {
       username,
       password,
     });
@@ -46,7 +97,7 @@ export async function loginUser(username: string, password: string) {
 
 export async function getUser(token: string) {
   try {
-    const res = await axios.get(`${API_URL}/auth/me/`, {
+    const res = await api.get(`/auth/me/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -66,10 +117,7 @@ export async function getUser(token: string) {
 
 export async function getUserDetail(username: string) {
   try {
-    const res = await axios.get(
-      `${API_URL}/auth/user_detail/?username=${username}`,
-      {}
-    );
+    const res = await api.get(`/auth/user_detail/?username=${username}`, {});
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -85,7 +133,7 @@ export async function getUserDetail(username: string) {
 
 export async function getPosts(limit = 10, page = 1) {
   try {
-    const res = await axios.get(`${API_URL}/blog/posts/`, {
+    const res = await api.get(`/blog/posts/`, {
       params: {
         limit,
         page,
@@ -101,7 +149,7 @@ export async function getPosts(limit = 10, page = 1) {
 
 export async function getPost(id: string) {
   try {
-    const res = await axios.get(`${API_URL}/blog/posts/${id}/`, {});
+    const res = await api.get(`/blog/posts/${id}/`, {});
     console.log("Fetched posts:", res.data);
     return res.data;
   } catch (error) {
@@ -112,7 +160,7 @@ export async function getPost(id: string) {
 
 export async function createPost(token: string, data: FormData) {
   try {
-    const res = await axios.post(`${API_URL}/blog/posts/`, data, {
+    const res = await api.post(`/blog/posts/`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -138,8 +186,9 @@ export async function createPost(token: string, data: FormData) {
 
 export async function likePost(token: string, id: string) {
   try {
-    const request = await axios.post(
-      `${API_URL}/blog/posts/${id}/like/`,
+    console.log("Token:", token);
+    const request = await api.post(
+      `/blog/posts/${id}/like/`,
       {},
       {
         headers: {
@@ -166,7 +215,7 @@ export async function likePost(token: string, id: string) {
 
 export async function searchQuery(query: string) {
   try {
-    const request = await axios.get(`${API_URL}/search/?search=${query}`, {});
+    const request = await api.get(`/search/?search=${query}`, {});
     console.log(request.data);
     return request.data;
   } catch (error) {

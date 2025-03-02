@@ -42,12 +42,13 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
   };
 
   const closeModal = () => {
-    setModalIsOpen(false);
+    setModalIsOpen(false);  
   };
 
   const handleLike = async () => {
     try {
       const response = await likePost(token, item.id);
+      console.log("Response from server:", response);
       if (response.message === "Post liked") {
         setLiked(true);
         setLikes((prev) => prev + 1);

@@ -11,7 +11,7 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting},
     reset,
   } = useForm();
   const router = useRouter();
@@ -22,7 +22,9 @@ const Login = () => {
     try {
       const userData = await loginUser(data.username, data.password);
       const user = await getUser(userData.access);
-      login(data.access, user);
+      console.log("Refresh token: ", userData.refresh);
+      
+      login(userData.access, userData.refresh, user);
       router.push("/");
     } catch {
       toast.error("Error");
@@ -68,6 +70,7 @@ const Login = () => {
         <button
           className="cursor-pointer group relative flex justify-center gap-1.5 px-6 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
           type="submit"
+          disabled={isSubmitting}
         >
           Register
         </button>
