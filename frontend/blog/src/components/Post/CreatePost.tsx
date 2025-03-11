@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { createPost } from "@/utils/api";
@@ -6,7 +6,6 @@ import { usePostsStore } from "@/store/usePostsStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
 import { toast } from "sonner";
-
 
 const CreatePost = () => {
   const [formData, setFormData] = useState({
@@ -65,7 +64,7 @@ const CreatePost = () => {
       }
 
       if (!token) {
-        toast.error("No authentication token found.");
+        toast.error("You need to be logged in to like a post.");
         throw new Error("No authentication token found.");
       }
 

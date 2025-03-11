@@ -14,7 +14,7 @@ interface Author {
   id: string;
   username: string;
   email: string;
-  photo?: string;
+  avatar?: string;
 }
 
 interface PostItem {
@@ -37,8 +37,8 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
   const [likes, setLikes] = useState<number>(Number(item.count_likes) || 0);
   const [liked, setLiked] = useState<boolean>(item.is_liked || false);
 
-  const authorPhoto = item.author.photo
-    ? item.author.photo
+  const authorPhoto = item.author.avatar
+    ? item.author.avatar
     : `https://ui-avatars.com/api/?name=${item.author.username}&size=40`;
 
   const handleLike = async () => {
@@ -75,7 +75,7 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
               alt={item.author.username}
               width={40}
               height={40}
-              className="author-photo rounded-[40px]"
+              className="author-photo rounded-full w-[40px] h-[40px] object-cover"
             />
           </Link>
           <Link href={`/profile/${item.author.username}`}>
@@ -85,6 +85,7 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         <time dateTime={item.created_at} className="post-date">
           {formattedDate}
         </time>
+        <div></div>
       </div>
       <div className="image__wrapper mb-[6px]">
         <Link href={`/post/${item.id}`}>

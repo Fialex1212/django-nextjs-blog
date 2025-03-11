@@ -11,14 +11,13 @@ const api = axios.create({
   },
 });
 
-// Добавляем интерцептор для автоматического обновления токена
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    console.log("Current token:", api.defaults.headers.common["Authorization"]);
-    console.log("Refresh token:", useAuthStore.getState().refresh_token);
+    // console.log("Current token:", api.defaults.headers.common["Authorization"]);
+    // console.log("Refresh token:", useAuthStore.getState().refresh_token);
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Помечаем, что запрос уже пытались повторить
@@ -37,23 +36,20 @@ api.interceptors.response.use(
 
         const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-        // Обновляем токены в Zustand и куках
         authStore.rewriteToken(accessToken);
         authStore.rewriteRefreshToken(newRefreshToken);
 
         console.log("Updated token:", authStore.token);
         console.log("Updated refresh token:", authStore.refresh_token);
 
-        // Обновляем заголовки и повторяем запрос
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        console.error("Token refresh failed:", refreshError.response?.data);
         const authStore = useAuthStore.getState();
-        authStore.logout(); // Удаляем токены из Zustand и куков
+        authStore.logout();
 
         window.location.href = "/auth/login";
         return Promise.reject(refreshError);
@@ -122,7 +118,6 @@ export async function getUser() {
   }
 }
 
-
 export async function getUserDetail(username: string) {
   try {
     const res = await api.get(`/auth/user_detail/?username=${username}`, {});
@@ -171,6 +166,7 @@ export async function createPost(token: string, data: FormData) {
     const res = await api.post(`/blog/posts/`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;
@@ -180,11 +176,10 @@ export async function createPost(token: string, data: FormData) {
         error?.response?.data?.error ||
         error?.message ||
         "An unexpected error occurred while creating the post. Please try again later.";
-      console.log(errorMessage);
-      toast.error(
-        "An unexpected error occurred while creating the post. Please try again later"
-      );
+      console.error("API Error:", errorMessage);
+      toast.error(errorMessage);
     } else {
+      console.error("General Error:", error);
       toast.error(
         "An unexpected error occurred while creating the post. Please try again later"
       );
@@ -228,5 +223,26 @@ export async function searchQuery(query: string) {
     return request.data;
   } catch (error) {
     console.log("Failed to search", error);
+  }
+}
+
+export async function uploadAvatar(token: string, formData: FormData) {
+  try {
+    const res = await api.post(`/auth/upload_avatar/`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to update avatar", error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error?.response?.data?.error || "Failed to update avatar";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Failed to update avatar");
+    }
   }
 }

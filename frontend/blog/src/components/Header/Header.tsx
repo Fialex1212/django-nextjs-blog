@@ -25,7 +25,7 @@ const Header = () => {
                   alt={user?.username}
                   width={50}
                   height={50}
-                  className="user__avatar rounded-[50px]"
+                  className="user__avatar rounded-full w-[50px] h-[50px] object-cover"
                 />
               </Link>
             </div>

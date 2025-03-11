@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework.viewsets import ViewSet
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, AvatarUpdateSerializer
 from rest_framework.decorators import action
 from .models import CustomUser
 from django.shortcuts import get_object_or_404
@@ -58,3 +58,18 @@ class AuthViewSet(ViewSet):
         user = get_object_or_404(CustomUser, username=username)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["post"], permission_classes=[IsAuthenticated])
+    def upload_avatar(self, request):
+
+        user = request.user
+        if "avatar_image" not in request.data:
+            return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        avatar_serializer = AvatarUpdateSerializer(user, data=request.data, partial=True)
+        if avatar_serializer.is_valid():
+            avatar_serializer.save()
+            return Response({"message": "Avatar updated successfully"}, status=status.HTTP_200_OK)
+        
+        return Response(avatar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
