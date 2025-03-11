@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { format } from "date-fns";
 
 interface Author {
   id: string;
@@ -15,8 +16,8 @@ interface PostItem {
   text: string;
   photo: string;
   created_at: string;
-  count_likes: number; 
-  is_liked: boolean; 
+  count_likes: number;
+  is_liked: boolean;
 }
 
 interface PostProps {
@@ -24,6 +25,7 @@ interface PostProps {
 }
 
 const Post: React.FC<PostProps> = ({ item }) => {
+  const formattedDate = format(new Date(item.created_at), "MMMM d, yyyy");
   const authorPhoto = item.author.photo
     ? item.author.photo
     : `https://ui-avatars.com/api/?name=${item.author.username}&size=40`;
@@ -38,7 +40,7 @@ const Post: React.FC<PostProps> = ({ item }) => {
                 alt={item.author.username}
                 width={40}
                 height={40}
-                className="author-photo"
+                className="author-photo rounded-[40px]"
               />
             </Link>
             <Link href={`/profile/${item.author.username}`}>
@@ -46,11 +48,7 @@ const Post: React.FC<PostProps> = ({ item }) => {
             </Link>
           </div>
           <time dateTime={item.created_at} className="post-date">
-            {new Date(item.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              day: "numeric",
-              month: "long",
-            })}
+            {formattedDate}
           </time>
         </div>
         <div className="image__wrapper">
@@ -58,8 +56,8 @@ const Post: React.FC<PostProps> = ({ item }) => {
             <Image
               src={item.photo}
               alt={item.text}
-              width={300}
-              height={300}
+              width={400}
+              height={400}
               className="post-photo"
             />
           )}

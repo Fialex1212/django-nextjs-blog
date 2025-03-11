@@ -17,7 +17,7 @@ const Header = () => {
         </Link>
         <SearchBar/>
         {user ? (
-          <div className="user__interface flex gap-[40px] w-[115px]">
+          <div className="user__interface flex justify-end gap-[40px] w-[115px]">
             <div className="avatar__wrapper">
               <Link href={`/profile/`}>
                 <Image

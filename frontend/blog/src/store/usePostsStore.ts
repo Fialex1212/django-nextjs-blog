@@ -14,6 +14,8 @@ interface Post {
   photo: string;
   created_at: string;
   updated_at: string;
+  count_likes: number; 
+  is_liked: boolean; 
 }
 
 interface PostState {
@@ -35,7 +37,7 @@ export const usePostsStore = create<PostState>((set) => ({
       const postsData = await getPosts(limit, page);
       console.log("Posts data in store:", postsData);
       if (postsData && postsData.results) {
-        set((state) => ({
+        set(() => ({
           posts: postsData.results,
           loading: false,
           page: page + 1,

@@ -12,6 +12,7 @@ const Search = () => {
   const query = searchParams.get("q") || "";
   const { result, error, loading, setQuery, search } = useSearchStore();
   const [selected, setSelected] = useState("All");
+  const tabsOptions = ["All", "Users", "Posts"]
 
   useEffect(() => {
     if (query) {
@@ -26,7 +27,7 @@ const Search = () => {
       <h2>Searching page</h2>
 
       <div className="flex justify-center">
-        <Tabs selected={selected} setSelected={setSelected} />
+        <Tabs selected={selected} setSelected={setSelected} tabsOptions={tabsOptions} />
       </div>
 
       {error && <p className="text-red-500">{error}</p>}

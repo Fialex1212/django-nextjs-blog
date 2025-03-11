@@ -1,10 +1,9 @@
 "use client";
 
-const Tabs = ({selected, setSelected}) => {
-
+const Tabs = ({ selected, setSelected, tabsOptions}) => {
   return (
     <div className="flex w-72 p-1 bg-gray-200 rounded-lg shadow">
-      {["All", "Users", "Posts"].map((option) => (
+      {tabsOptions.map((option) => (
         <label key={option} className="flex-1 cursor-pointer">
           <input
             type="radio"

@@ -1,14 +1,14 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePostsStore } from "@/store/usePostsStore";
-import PostItem from "../Post/PostItem";
+import PostList from "../Post/PostList";
 
 const Home = () => {
-  const { posts, loading, error, page, fetchPosts } = usePostsStore();
+  const { loading, error, page, fetchPosts } = usePostsStore();
   // const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    fetchPosts(100, page);
+    fetchPosts();
   }, [fetchPosts, page]);
 
   // useEffect(() => {
@@ -44,19 +44,7 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center justify-start min-h-screen]">
       <div className="container flex justify-center">
-        <ul className="posts__list flex flex-col gap-[20px] w-[300px]">
-          {posts && posts.length > 0 ? (
-            posts.map((post, index) => (
-              <li className="w-full" key={index}>
-                <PostItem item={post} />
-              </li>
-            ))
-          ) : (
-            <li>
-              <p>No posts available.</p>
-            </li>
-          )}
-        </ul>
+        <PostList />
       </div>
     </div>
   );
