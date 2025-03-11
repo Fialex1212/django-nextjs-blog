@@ -13,18 +13,26 @@ interface AuthState {
   user: User | null;
   token: string | null;
   refresh_token: string | null;
+  rewriteToken: (token: string) => void;
+  rewriteRefreshToken: (refresh_token: string) => void;
   loading: boolean;
   login: (token: string, refresh_token: string, user: User) => void;
   logout: () => void;
   loadUser: () => Promise<void>;
 }
 
-
-
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: Cookies.get("accessToken") || null,
   refresh_token: Cookies.get("refreshToken") || null,
+  rewriteToken: (token) => {
+    Cookies.set("accessToken", token, { expires: 7 });
+    set({ token });
+  },
+  rewriteRefreshToken: (refresh_token) => {
+    Cookies.set("refreshToken", refresh_token, { expires: 7 });
+    set({ refresh_token });
+  },
   loading: true,
   login: (token, refresh_token, user) => {
     Cookies.set("accessToken", token, { expires: 7 });
@@ -32,7 +40,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token, refresh_token, user, loading: false });
   },
   logout: () => {
-    Cookies.remove("token");
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
     set({ token: null, user: null, loading: false });
   },
   loadUser: async () => {
@@ -43,10 +52,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     try {
-      const user = await getUser(token);
+      const user = await getUser();
       set({ user, loading: false });
     } catch (error) {
-      console.error("Ошибка загрузки пользователя:", error);
+      console.error("Failed to fetch user:", error);
       Cookies.remove("refreshToken");
       Cookies.remove("accessToken");
       set({ token: null, user: null, loading: false });

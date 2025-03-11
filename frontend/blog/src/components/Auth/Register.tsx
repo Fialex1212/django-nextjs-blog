@@ -20,7 +20,7 @@ const Register = () => {
     console.log(data.username, data.email, data.password);
     try {
       await registerUser(data.username, data.email, data.password);
-      router.push("/login");
+      router.push("/auth/login");
     } catch {
       toast.error("Error");
     }
@@ -101,7 +101,7 @@ const Register = () => {
         </button>
         <div className="flex justify-center gap-[10px] font-semibold">
           <p>Already have an account?</p>
-          <Link className="text-blue-600 underline" href={"/login"}>
+          <Link className="text-blue-600 underline" href={"/auth/login"}>
             Login
           </Link>
         </div>

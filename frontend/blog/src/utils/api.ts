@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -10,49 +11,66 @@ const api = axios.create({
   },
 });
 
+// Добавляем интерцептор для автоматического обновления токена
 api.interceptors.response.use(
-  (response) => response, // Directly return successful responses.
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    console.log("Current token:", api.defaults.headers.common["Authorization"]);
+    console.log("Refresh token:", useAuthStore.getState().refresh_token);
+
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+      originalRequest._retry = true; // Помечаем, что запрос уже пытались повторить
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken"); // Retrieve the stored refresh token.
+        const authStore = useAuthStore.getState(); // <-- Получаем состояние хранилища правильно
+        const refreshToken = authStore.refresh_token;
+
         if (!refreshToken) {
           throw new Error("No refresh token found.");
         }
 
-        // Make a request to your auth server to refresh the token.
         const response = await axios.post(`${API_URL}/auth/token/refresh/`, {
           refresh: refreshToken,
         });
 
         const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-        // Store the new access and refresh tokens.
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
+        // Обновляем токены в Zustand и куках
+        authStore.rewriteToken(accessToken);
+        authStore.rewriteRefreshToken(newRefreshToken);
 
-        // Update the authorization header with the new access token.
+        console.log("Updated token:", authStore.token);
+        console.log("Updated refresh token:", authStore.refresh_token);
+
+        // Обновляем заголовки и повторяем запрос
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
 
-        return api(originalRequest); // Retry the original request with the new access token.
+        return api(originalRequest);
       } catch (refreshError) {
-        // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
         console.error("Token refresh failed:", refreshError);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
+        console.error("Token refresh failed:", refreshError.response?.data);
+        const authStore = useAuthStore.getState();
+        authStore.logout(); // Удаляем токены из Zustand и куков
+
+        window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error); // For all other errors, return the error as is.
+    return Promise.reject(error);
   }
 );
+
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export async function registerUser(
   username: string,
@@ -95,25 +113,15 @@ export async function loginUser(username: string, password: string) {
   }
 }
 
-export async function getUser(token: string) {
+export async function getUser() {
   try {
-    const res = await api.get(`/auth/me/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await api.get(`/auth/me/`);
     return res.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage =
-        error.response?.data?.error || "Failed to fetch user data";
-      console.log(errorMessage);
-      toast.error("Failed to fetch user data");
-    } else {
-      toast.error("Failed to fetch user data");
-    }
+    console.log("Failed to fetch user data", error);
   }
 }
+
 
 export async function getUserDetail(username: string) {
   try {

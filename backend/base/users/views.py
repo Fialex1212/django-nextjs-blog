@@ -44,7 +44,6 @@ class AuthViewSet(ViewSet):
         )
 
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
-    @permission_classes([IsAuthenticated])
     def me(self, request):
         return Response(UserSerializer(request.user).data)
 
@@ -57,7 +56,5 @@ class AuthViewSet(ViewSet):
                 {"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST
             )
         user = get_object_or_404(CustomUser, username=username)
-        if user:
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"error": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

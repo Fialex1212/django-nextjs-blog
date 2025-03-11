@@ -1,17 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import CreatePost from "../Post/CreatePost";
-import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import SearchBar from "../SearchBar/SearchBar";
-import { searchQuery } from "@/utils/api";
 
 const Header = () => {
   const { user } = useAuthStore();
   const authorPhoto = user?.avatar
-    ? user?.avatar
+    ? `http://127.0.0.1:8000${user?.avatar}` //TODO fix avatar url
     : `https://ui-avatars.com/api/?name=${user?.username}&size=40`;
-  const [modalIsOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -21,8 +17,7 @@ const Header = () => {
         </Link>
         <SearchBar/>
         {user ? (
-          <div className="user__interface flex gap-[40px]">
-            <CreatePost modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} />
+          <div className="user__interface flex gap-[40px] w-[115px]">
             <div className="avatar__wrapper">
               <Link href={`/profile/`}>
                 <Image

@@ -21,8 +21,9 @@ const Login = () => {
     console.log(data.username, data.password);
     try {
       const userData = await loginUser(data.username, data.password);
-      const user = await getUser(userData.access);
+      const user = await getUser();
       console.log("Refresh token: ", userData.refresh);
+      console.log("Access token: ", userData.access);
       
       login(userData.access, userData.refresh, user);
       router.push("/");
@@ -72,11 +73,11 @@ const Login = () => {
           type="submit"
           disabled={isSubmitting}
         >
-          Register
+          Login
         </button>
         <div className="flex justify-center gap-[10px] font-semibold">
           <p>Do not have an account?</p>
-          <Link className="text-blue-600 underline" href={"/register"}>
+          <Link className="text-blue-600 underline" href={"/auth/register"}>
             Register
           </Link>
         </div>
