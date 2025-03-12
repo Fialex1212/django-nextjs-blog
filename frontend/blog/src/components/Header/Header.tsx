@@ -5,9 +5,19 @@ import SearchBar from "../SearchBar/SearchBar";
 
 const Header = () => {
   const { user } = useAuthStore();
-  const authorPhoto = user?.avatar
-    ? `http://127.0.0.1:8000${user?.avatar}` //TODO fix avatar url
-    : `https://ui-avatars.com/api/?name=${user?.username}&size=40`;
+  const userAvatar = user?.avatar ? (
+    <Image
+      className="rounded-full w-[50px] h-[50px] object-cover"
+      src={`http://127.0.0.1:8000${user?.avatar}`}
+      alt={`avatar_of_${user?.username}`}
+      width={50}
+      height={50}
+    />
+  ) : (
+    <div className="w-[50px] h-[50px] bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-[70px] mb-[20px]">
+      {user?.username.slice(0, 2).toUpperCase()}
+    </div>
+  );
 
   return (
     <>
@@ -15,24 +25,16 @@ const Header = () => {
         <Link className="text-[32px]" href={"/"}>
           My Blog
         </Link>
-        <SearchBar/>
+        <SearchBar />
         {user ? (
           <div className="user__interface flex justify-end gap-[40px] w-[115px]">
             <div className="avatar__wrapper">
-              <Link href={`/profile/`}>
-                <Image
-                  src={authorPhoto}
-                  alt={user?.username}
-                  width={50}
-                  height={50}
-                  className="user__avatar rounded-full w-[50px] h-[50px] object-cover"
-                />
-              </Link>
+              <Link href={`/profile/you`}>{userAvatar}</Link>
             </div>
           </div>
         ) : (
           <div>
-            <Link href={"login"}>Login</Link>
+            <Link href={"/auth/login"}>Login</Link>
           </div>
         )}
       </header>

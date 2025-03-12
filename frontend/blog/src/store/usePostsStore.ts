@@ -14,8 +14,8 @@ interface Post {
   photo: string;
   created_at: string;
   updated_at: string;
-  count_likes: number; 
-  is_liked: boolean; 
+  count_likes: number;
+  is_liked: boolean;
 }
 
 interface PostState {
@@ -24,6 +24,7 @@ interface PostState {
   error: string | null;
   page: number;
   fetchPosts: () => Promise<void>;
+  deletePostFromStore: (postId: string) => void;
 }
 
 export const usePostsStore = create<PostState>((set) => ({
@@ -53,5 +54,10 @@ export const usePostsStore = create<PostState>((set) => ({
         set({ loading: false, error: "An unknown error occurred" });
       }
     }
+  },
+  deletePostFromStore: (postId: string) => {
+    set((state) => ({
+      posts: state.posts.filter((post) => post.id !== postId),
+    }));
   },
 }));

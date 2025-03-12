@@ -6,8 +6,10 @@ import { usePostsStore } from "@/store/usePostsStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const CreatePost = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     text: "",
     photo: null as File | null,
@@ -79,6 +81,7 @@ const CreatePost = () => {
       setPreview(null);
 
       await fetchPosts();
+      router.push("/")
     } catch (error) {
       console.error("Error creating post:", error);
       setError(

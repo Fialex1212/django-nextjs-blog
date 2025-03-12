@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import Image from "next/image";
 import { Pencil } from "lucide-react";
 import ProfileUpdateAvatar from "./ProfileUpdateAvatar";
+import Link from "next/link";
 
 const Profile = () => {
   const { user, logout } = useAuthStore();
@@ -56,17 +57,21 @@ const Profile = () => {
       />
 
       <div className="flex flex-col gap-4">
-        <button
-          onClick={() => {
-            router.push("/post/create");
-          }}
-          className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+        <Link
+          href={"/post/create"}
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
         >
           Create a post
-        </button>
+        </Link>
+        <Link
+          href={"/profile/you/settings"}
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+        >
+          Settings
+        </Link>
         <button
           onClick={handleLogout}
-          className="cursor-pointer group relative gap-1.5 px-8 py-4 bg-red-500 bg-opacity-95 w-[160px] flex justify-center text-white rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-8 py-4 bg-red-500 bg-opacity-95 w-[160px] text-white rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
         >
           Logout
         </button>

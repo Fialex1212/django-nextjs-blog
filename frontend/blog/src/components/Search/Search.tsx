@@ -6,13 +6,14 @@ import { useSearchParams } from "next/navigation";
 import Tabs from "../Tabs/Tabs";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Search = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const { result, error, loading, setQuery, search } = useSearchStore();
   const [selected, setSelected] = useState("All");
-  const tabsOptions = ["All", "Users", "Posts"]
+  const tabsOptions = ["All", "Users", "Posts"];
 
   useEffect(() => {
     if (query) {
@@ -21,13 +22,16 @@ const Search = () => {
     }
   }, [query, setQuery, search]);
 
-
   return (
     <div className="container">
-      <h2>Searching page</h2>
+      <h2 className="text-[50px] text-center mb-[20px]">Searching page</h2>
 
       <div className="flex justify-center">
-        <Tabs selected={selected} setSelected={setSelected} tabsOptions={tabsOptions} />
+        <Tabs
+          selected={selected}
+          setSelected={setSelected}
+          tabsOptions={tabsOptions}
+        />
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
@@ -50,9 +54,19 @@ const Search = () => {
                           className="flex items-center gap-4"
                           href={`/profile/${user.username}`}
                         >
-                          <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
-                            {user.username.slice(0, 2).toUpperCase()}
-                          </div>
+                          {user?.avatar ? (
+                            <Image
+                              className="rounded-full w-[40px] h-[40px] object-cover"
+                              src={user?.avatar}
+                              alt={`avatar_of_${user?.username}`}
+                              width={40}
+                              height={40}
+                            />
+                          ) : (
+                            <div className="w-[40px] h-[40px] bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-[20px]">
+                              {user?.username.slice(0, 2).toUpperCase()}
+                            </div>
+                          )}
                           <span>
                             {user.username} - {user.email}
                           </span>

@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import { likePost } from "@/utils/api";
+import { deletePost, likePost } from "@/utils/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Heart, MessageCircle, Send } from "lucide-react";
+import { usePostsStore } from "@/store/usePostsStore";
 
 interface Author {
   id: string;
@@ -33,13 +34,23 @@ interface PostProps {
 
 const PostItem: React.FC<PostProps> = ({ item }) => {
   const formattedDate = format(new Date(item.created_at), "MMMM d, yyyy");
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
   const [likes, setLikes] = useState<number>(Number(item.count_likes) || 0);
   const [liked, setLiked] = useState<boolean>(item.is_liked || false);
 
-  const authorPhoto = item.author.avatar
-    ? item.author.avatar
-    : `https://ui-avatars.com/api/?name=${item.author.username}&size=40`;
+  const userAvatar = item.author?.avatar ? (
+    <Image
+      className="rounded-full w-[40px] h-[40px] object-cover"
+      src={item.author?.avatar}
+      alt={`avatar_of_${item.author?.username}`}
+      width={40}
+      height={40}
+    />
+  ) : (
+    <div className="w-[40px] h-[40px] bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-[20px]">
+      {item.author?.username.slice(0, 2).toUpperCase()}
+    </div>
+  );
 
   const handleLike = async () => {
     if (!token) {
@@ -65,19 +76,26 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!token) {
+      toast.error("You need to be logged in to delete a post");
+      return;
+    }
+
+    try {
+      await deletePost(token, item.id);
+      toast.success(`Post with id ${item.id} was deleted`);
+      usePostsStore.getState().deletePostFromStore(item.id);
+    } catch {
+      toast.error("Failed to delete the post");
+    }
+  };
+
   return (
     <div className="post">
       <div className="post-header flex items-center gap-[10px] mb-[10px]">
         <div className="author-info flex items-center gap-[10px]">
-          <Link href={`/profile/${item.author.username}`}>
-            <Image
-              src={authorPhoto}
-              alt={item.author.username}
-              width={40}
-              height={40}
-              className="author-photo rounded-full w-[40px] h-[40px] object-cover"
-            />
-          </Link>
+          <Link href={`/profile/${item.author.username}`}>{userAvatar}</Link>
           <Link href={`/profile/${item.author.username}`}>
             {item.author.username}
           </Link>
@@ -85,7 +103,23 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         <time dateTime={item.created_at} className="post-date">
           {formattedDate}
         </time>
-        <div></div>
+        <ul className="post__menu">
+          {item.author.id == user?.id ? (
+            <>
+              {" "}
+              <li>
+                <Link href={`/post/${item.id}/update`}>Update</Link>
+              </li>
+              <li>
+                <button onClick={handleDelete}>Delete</button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <button onClick={handleDelete}>Do not recommend me</button>
+            </li>
+          )}
+        </ul>
       </div>
       <div className="image__wrapper mb-[6px]">
         <Link href={`/post/${item.id}`}>

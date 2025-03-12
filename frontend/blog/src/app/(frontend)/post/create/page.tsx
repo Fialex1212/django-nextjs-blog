@@ -1,6 +1,6 @@
 import CreatePost from "@/components/Post/CreatePost";
 
-export default function () {
+export default function CreatePostPage() {
     return(
         <CreatePost />
     )

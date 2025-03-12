@@ -187,6 +187,54 @@ export async function createPost(token: string, data: FormData) {
   }
 }
 
+export async function updatePost(
+  token: string,
+  postId: string,
+  data: FormData
+) {
+  try {
+    const response = await axios.put(
+      `${API_URL}/blog/posts/${postId}/update_post/`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating post:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+}
+
+export async function deletePost(token: string, postId: string) {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/blog/posts/${postId}/delete_post/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error deleting post:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+}
+
 export async function likePost(token: string, id: string) {
   try {
     console.log("Token:", token);

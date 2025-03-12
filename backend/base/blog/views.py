@@ -34,8 +34,7 @@ class PostViewSet(viewsets.ModelViewSet):
         print(self.request.headers)
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=["post"])
-    @permission_classes([IsAuthenticated])
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         user = request.user
         if not user.is_authenticated:
@@ -64,6 +63,42 @@ class PostViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    @action(detail=True, methods=["put"], permission_classes=[IsAuthenticated])
+    def update_post(self, request, pk=None):
+        user = request.user
+
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if user != post.author:
+            return Response({"error": "You are not the author of this post"}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = PostSerializer(post, data=request.data, partial=True, context={"request": request})
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=["delete"], permission_classes=[IsAuthenticated])
+    def delete_post(self, request, pk=None):
+        user = request.user
+
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if user != post.author:
+            return Response({"error": "You are not the author of this post"}, status=status.HTTP_403_FORBIDDEN)
+
+       
+        post.delete()
+
+        return Response({"message": f"Post {pk} was deleted"}, status=status.HTTP_200_OK)
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
