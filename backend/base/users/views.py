@@ -14,6 +14,7 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, Bl
 import re
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
 
 
 def get_tokens_for_user(user):
@@ -132,7 +133,13 @@ class AuthViewSet(ViewSet):
                 {"error": "Username and Email are required"}, status=status.HTTP_400_BAD_REQUEST
             )
         
-        user = get_object_or_404(CustomUser, username=username)
+        try:
+            user = get_object_or_404(CustomUser, username=username)
+        except Http404:
+            return Response(
+                {"error": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
     
         if request.user != user:
             return Response(
@@ -140,8 +147,33 @@ class AuthViewSet(ViewSet):
                 status=status.HTTP_403_FORBIDDEN,
             )
         
-        user.email = new_email
-        user.save()
+        try:
+            EmailValidator(new_email)
+        except ValidationError:
+            return Response(
+                {"error": "Invalid email format."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if CustomUser.objects.filter(email=new_email).exists():
+            return Response(
+                {"error": "This email is already taken"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user.email = new_email
+            user.save()
+        except IntegrityError:
+            return Response(
+                {"error": "Database error. Try again later."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except ValidationError as ex:
+            return Response(
+                {"error": f"Invalid data: {str(ex)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response({"message": "Email updated successfully", "email": user.email}, status=status.HTTP_200_OK)
     

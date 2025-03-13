@@ -63,7 +63,7 @@ const SettingsUpdateUsername = () => {
                 message: "Username must not exceed 23 characters",
               },
               pattern: {
-                value: /^[a-zA-Z0-9_]+$/,
+                value: /^[a-zA-Z0-9_]+$/, // Username with only alphanumeric characters and underscores
                 message:
                   "Username can only contain letters, numbers, and underscores",
               },

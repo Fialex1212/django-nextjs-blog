@@ -189,22 +189,45 @@ export async function updateUsername(
 }
 
 //UPDATE EMAIL
-export async function updateEmail(username: string, formData: FormData) {
+export async function updateEmail(currentUsername: string, newEmail: string) {
   try {
-    const res = await api.post(
-      `/auth/update_email/?username=${username}`,
-      formData
-    );
+    const formData = new FormData();
+    formData.append("new_email", newEmail);
+
+    const res = await api.post(`/auth/update_email/`, formData, {
+      params: { username: currentUsername },
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
     return res.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage =
-        error.response?.data?.error || "Failed to update username";
-      console.log(errorMessage);
-      toast.error("Failed to update username");
+    if (axios.isAxiosError(error) && error.response) {
+      const { data, status } = error.response;
+
+      console.error("Error updating username:", data);
+
+      if (status === 400 && data.error) {
+        toast.error(data.error);
+      } else if (status === 400 && typeof data === "object") {
+        Object.values(data).forEach((msg) => {
+          if (typeof msg === "string") {
+            toast.error(msg);
+          } else if (Array.isArray(msg)) {
+            msg.forEach((m) => toast.error(m));
+          }
+        });
+      } else if (status === 403) {
+        toast.error("You don't have permission to change this username.");
+      } else if (status === 404) {
+        toast.error("User not found.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } else {
-      toast.error("Failed to update username");
+      toast.error("Failed to update username due to an unknown error.");
     }
+
+    throw error;
   }
 }
 
