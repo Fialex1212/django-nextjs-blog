@@ -1,5 +1,5 @@
-import Profile from "@/components/Profile/Profile";
+import SettingsProfile from "@/components/Profile/Settings/SettingsProfile";
 
-export default function ProfilePage() {
-    return <Profile />
+export default function ProfileSettingsPage() {
+    return <SettingsProfile />
 };

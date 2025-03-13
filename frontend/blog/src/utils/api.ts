@@ -60,6 +60,8 @@ api.interceptors.response.use(
   }
 );
 
+//AUTH
+
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
   if (token) {
@@ -68,6 +70,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+//REGISTER
 export async function registerUser(
   username: string,
   email: string,
@@ -91,6 +94,7 @@ export async function registerUser(
   }
 }
 
+//LOGIN
 export async function loginUser(username: string, password: string) {
   try {
     const res = await api.post(`/auth/login/`, {
@@ -109,6 +113,9 @@ export async function loginUser(username: string, password: string) {
   }
 }
 
+//USER
+
+//GET ME
 export async function getUser() {
   try {
     const res = await api.get(`/auth/me/`);
@@ -118,6 +125,7 @@ export async function getUser() {
   }
 }
 
+//GET USER DETAIL
 export async function getUserDetail(username: string) {
   try {
     const res = await api.get(`/auth/user_detail/?username=${username}`, {});
@@ -133,6 +141,116 @@ export async function getUserDetail(username: string) {
     }
   }
 }
+
+//UPDATE USERNAME
+export async function updateUsername(
+  currentUsername: string,
+  newUsername: string
+) {
+  try {
+    const formData = new FormData();
+    formData.append("new_username", newUsername);
+
+    const res = await api.post(`/auth/update_username/`, formData, {
+      params: { username: currentUsername },
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const { data, status } = error.response;
+
+      console.error("Error updating username:", data);
+
+      if (status === 400 && data.error) {
+        toast.error(data.error);
+      } else if (status === 400 && typeof data === "object") {
+        Object.values(data).forEach((msg) => {
+          if (typeof msg === "string") {
+            toast.error(msg);
+          } else if (Array.isArray(msg)) {
+            msg.forEach((m) => toast.error(m));
+          }
+        });
+      } else if (status === 403) {
+        toast.error("You don't have permission to change this username.");
+      } else if (status === 404) {
+        toast.error("User not found.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } else {
+      toast.error("Failed to update username due to an unknown error.");
+    }
+
+    throw error;
+  }
+}
+
+//UPDATE EMAIL
+export async function updateEmail(username: string, formData: FormData) {
+  try {
+    const res = await api.post(
+      `/auth/update_email/?username=${username}`,
+      formData
+    );
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.error || "Failed to update username";
+      console.log(errorMessage);
+      toast.error("Failed to update username");
+    } else {
+      toast.error("Failed to update username");
+    }
+  }
+}
+
+//UPDATE PASSWORD
+export async function updatePassword(username: string, formData: FormData) {
+  try {
+    const res = await api.post(
+      `/auth/update_password/?username=${username}`,
+      formData
+    );
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.error || "Failed to update username";
+      console.log(errorMessage);
+      toast.error("Failed to update username");
+    } else {
+      toast.error("Failed to update username");
+    }
+  }
+}
+
+//ULOAD AVATAR
+export async function uploadAvatar(token: string, formData: FormData) {
+  try {
+    const res = await api.post(`/auth/upload_avatar/`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.log("Failed to update avatar", error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error?.response?.data?.error || "Failed to update avatar";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Failed to update avatar");
+    }
+  }
+}
+
+//POSTS
 
 export async function getPosts(limit = 10, page = 1) {
   try {
@@ -271,26 +389,5 @@ export async function searchQuery(query: string) {
     return request.data;
   } catch (error) {
     console.log("Failed to search", error);
-  }
-}
-
-export async function uploadAvatar(token: string, formData: FormData) {
-  try {
-    const res = await api.post(`/auth/upload_avatar/`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.log("Failed to update avatar", error);
-    if (axios.isAxiosError(error)) {
-      const errorMessage =
-        error?.response?.data?.error || "Failed to update avatar";
-      toast.error(errorMessage);
-    } else {
-      toast.error("Failed to update avatar");
-    }
   }
 }

@@ -11,7 +11,7 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting},
+    formState: { errors, isSubmitting },
     reset,
   } = useForm();
   const router = useRouter();
@@ -24,7 +24,7 @@ const Login = () => {
       const user = await getUser();
       console.log("Refresh token: ", userData.refresh);
       console.log("Access token: ", userData.access);
-      
+
       login(userData.access, userData.refresh, user);
       router.push("/");
     } catch {
@@ -56,8 +56,17 @@ const Login = () => {
             {...register("password", {
               required: "Password is required",
               minLength: {
-                value: 8,
-                message: "Password must be at least 8 characters",
+                value: 3,
+                message: "Username must be at least 3 characters",
+              },
+              maxLength: {
+                value: 23,
+                message: "Username must not exceed 23 characters",
+              },
+              pattern: {
+                value: /^[a-zA-Z0-9_]+$/,
+                message:
+                  "Username can only contain letters, numbers, and underscores",
               },
             })}
             className="border-b border-black-500 border-style: dashed w-full"
