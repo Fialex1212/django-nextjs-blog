@@ -25,7 +25,6 @@ Develop a modern blog platform using Django for the backend and Next.js for the 
 ## **Installation**
 Clone my project
 ```cmd
-    git clone https://github.com/Fialex1212/nextjs-django-market.git
     git clone https://github.com/Fialex1212/django-nextjs-blog.git
 ```
 
