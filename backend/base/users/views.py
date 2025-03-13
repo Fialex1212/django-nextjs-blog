@@ -11,6 +11,7 @@ from .models import CustomUser
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+
 import re
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError

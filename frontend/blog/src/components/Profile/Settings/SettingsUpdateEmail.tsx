@@ -40,6 +40,7 @@ const SettingsUpdateEmail = () => {
     try {
       await updateEmail(user?.username, data.email);
       router.push("/");
+      toast.success("Email was successfuly updated")
     } catch {}
     reset();
   };

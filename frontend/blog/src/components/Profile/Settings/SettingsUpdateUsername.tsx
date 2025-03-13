@@ -40,6 +40,7 @@ const SettingsUpdateUsername = () => {
     try {
       await updateUsername(user?.username, data.username);
       router.push("/");
+      toast.success("Username was successfuly updated")
     } catch {}
     reset();
   };

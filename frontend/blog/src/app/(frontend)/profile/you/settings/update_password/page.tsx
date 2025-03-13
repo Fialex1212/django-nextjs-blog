@@ -1,7 +1,5 @@
+import SettingsUpdatePassword from "@/components/Profile/Settings/SettingsUpdatePassword";
+
 export default function UpdatePasswordPage() {
-  return (
-    <>
-      <div>hello</div>
-    </>
-  );
+  return <SettingsUpdatePassword />;
 }
