@@ -3,7 +3,6 @@ import PostItem from "./PostItem";
 import { usePostsStore } from "@/store/usePostsStore";
 
 const PostList = () => {
-
   const { posts } = usePostsStore();
 
   return (
@@ -11,7 +10,11 @@ const PostList = () => {
       {posts && posts.length > 0 ? (
         posts.map((post, index) => (
           <li className="w-full" key={index}>
-            <PostItem item={post} />
+            <div className="mb-[20px]">
+              <PostItem item={post} />
+            </div>
+
+            <div className="w-full h-[2px] bg-gray-500"></div>
           </li>
         ))
       ) : (

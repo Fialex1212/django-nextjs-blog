@@ -9,6 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 from .models import Post, PostLike
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import serializers
+
 
 
 class PostPagination(PageNumberPagination):
@@ -29,10 +31,10 @@ class PostViewSet(viewsets.ModelViewSet):
         context["request"] = self.request
         return context
 
-    @action(detail=False, methods=["post"])
-    def perform_create(self, serializer):
-        print(self.request.headers)
-        serializer.save(author=self.request.user)
+    # @action(detail=False, methods=["post"])
+    # def perform_create(self, serializer):
+    #     print(self.request.headers)
+    #     serializer.save(author=self.request.user)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
@@ -100,13 +102,26 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response({"message": f"Post {pk} was deleted"}, status=status.HTTP_200_OK)
 
+from rest_framework.exceptions import NotFound
+
 class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def get_queryset(self):
         post_id = self.kwargs.get("post_id")
-        return Comment.objects.filter(post_id=post_id)
-
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            raise NotFound(detail="Post not found.")
+        return Comment.objects.filter(post=post)
+    
     def perform_create(self, serializer):
         post_id = self.kwargs.get("post_id")
-        serializer.save(post_id=post_id, author=self.request.user)
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            raise serializers.ValidationError({"error": "Post not found"})
+
+        serializer.save(post=post, author=self.request.user)
+

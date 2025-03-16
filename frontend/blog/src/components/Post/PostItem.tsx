@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import { deletePost, likePost } from "@/utils/api";
+import { createComment, deletePost, likePost } from "@/utils/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, Send } from "lucide-react";
+import { Heart, MessageCircle, Send, Ellipsis } from "lucide-react";
 import { usePostsStore } from "@/store/usePostsStore";
+import { FieldValues, useForm } from "react-hook-form";
+import Popover from "../Popover/Popover";
 
 interface Author {
   id: string;
@@ -37,6 +39,12 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
   const { token, user } = useAuthStore();
   const [likes, setLikes] = useState<number>(Number(item.count_likes) || 0);
   const [liked, setLiked] = useState<boolean>(item.is_liked || false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm();
 
   const userAvatar = item.author?.avatar ? (
     <Image
@@ -76,6 +84,13 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(`http://localhost:3000/post/${item.id}`)
+      .then(() => toast.success("Link copied"))
+      .catch((error) => console.error("Failed to copy:", error));
+  };
+
   const handleDelete = async () => {
     if (!token) {
       toast.error("You need to be logged in to delete a post");
@@ -91,6 +106,22 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
     }
   };
 
+  const onSubmit = async (data: FieldValues) => {
+    console.log(data.comment);
+
+    if (!user?.id) {
+      toast.error("User's current email is not available.");
+      return;
+    }
+
+    try {
+      await createComment(item.id, data.comment);
+      toast.success("Comment was successfuly ");
+    } catch {}
+
+    reset();
+  };
+
   return (
     <div className="post">
       <div className="post-header flex items-center gap-[10px] mb-[10px]">
@@ -100,26 +131,46 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
             {item.author.username}
           </Link>
         </div>
-        <time dateTime={item.created_at} className="post-date">
+        <time dateTime={item.created_at} className="post-date mr-auto">
           {formattedDate}
         </time>
-        <ul className="post__menu">
-          {item.author.id == user?.id ? (
-            <>
-              {" "}
-              <li>
-                <Link href={`/post/${item.id}/update`}>Update</Link>
-              </li>
-              <li>
-                <button onClick={handleDelete}>Delete</button>
-              </li>
-            </>
-          ) : (
-            <li>
-              <button onClick={handleDelete}>Do not recommend me</button>
-            </li>
-          )}
-        </ul>
+        <Popover
+          content={
+            <ul className="post__menu flex flex-col gap-[10px] items-center ">
+              {item.author.id == user?.id ? (
+                <>
+                  <li>
+                    <Link
+                      className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+                      href={`/post/${item.id}/update`}
+                    >
+                      Update
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <button
+                    className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+                    onClick={handleDelete}
+                  >
+                    Do not recommend me
+                  </button>
+                </li>
+              )}
+            </ul>
+          }
+        >
+          <Ellipsis />
+        </Popover>
       </div>
       <div className="image__wrapper mb-[6px]">
         <Link href={`/post/${item.id}`}>
@@ -158,7 +209,7 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
           <button>
             <MessageCircle size={24} />
           </button>
-          <button>
+          <button onClick={handleCopy}>
             <Send size={24} />
           </button>
         </div>
@@ -168,6 +219,27 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         </div>
         <div className="post-text flex gap-[10px]">
           <p>{item.author.username}</p> <p>{item.text}</p>{" "}
+        </div>
+        <div className="w-full">
+          <form
+            className="flex justify-between"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <label className="w-full">
+              <input
+                {...register("comment")}
+                className="border-b border-black-500 border-style: dashed w-full"
+                type="text"
+                placeholder="Add comment"
+              />
+              {errors.comment && (
+                <p className="text-red-500">{`${errors.comment.message}`}</p>
+              )}
+            </label>
+            <button type="submit" disabled={isSubmitting}>
+              publish
+            </button>
+          </form>
         </div>
       </div>
     </div>

@@ -40,7 +40,7 @@ export default function PostPage() {
   if (!post) return <p>No post found.</p>;
 
   return (
-    <div className="container">
+    <div className="container flex items-center justify-center min-h-[calc(100vh-236px)]">
       <PostItem item={post} />
     </div>
   );

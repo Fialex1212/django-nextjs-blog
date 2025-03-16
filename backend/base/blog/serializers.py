@@ -5,11 +5,14 @@ from users.serializers import UserSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all(), write_only=True)
 
     class Meta:
         model = Comment
-        fields = ["id", "author", "post", "text", "created_at", "updated_at"]
+        fields = ['id', 'author', 'text', 'post']
+    
+    def create(self, validated_data):
+        return super().create(validated_data)
 
 
 class PostSerializer(serializers.ModelSerializer):

@@ -238,7 +238,7 @@ export async function updatePassword(
   oldPassword: string
 ) {
   console.log(newPassword, oldPassword);
-  
+
   try {
     const res = await api.post(
       `/auth/update_password/`,
@@ -305,6 +305,7 @@ export async function uploadAvatar(token: string, formData: FormData) {
 
 //POSTS
 
+//GET POSTS
 export async function getPosts(limit = 10, page = 1) {
   try {
     const res = await api.get(`/blog/posts/`, {
@@ -321,6 +322,7 @@ export async function getPosts(limit = 10, page = 1) {
   }
 }
 
+//GET POST
 export async function getPost(id: string) {
   try {
     const res = await api.get(`/blog/posts/${id}/`, {});
@@ -332,6 +334,7 @@ export async function getPost(id: string) {
   }
 }
 
+//CREATE POST
 export async function createPost(token: string, data: FormData) {
   try {
     const res = await api.post(`/blog/posts/`, data, {
@@ -358,6 +361,7 @@ export async function createPost(token: string, data: FormData) {
   }
 }
 
+//UPDATE POST
 export async function updatePost(
   token: string,
   postId: string,
@@ -385,6 +389,7 @@ export async function updatePost(
   }
 }
 
+//DELETE POST
 export async function deletePost(token: string, postId: string) {
   try {
     const response = await axios.delete(
@@ -406,9 +411,9 @@ export async function deletePost(token: string, postId: string) {
   }
 }
 
+//LIKE POST
 export async function likePost(token: string, id: string) {
   try {
-    console.log("Token:", token);
     const request = await api.post(
       `/blog/posts/${id}/like/`,
       {},
@@ -435,6 +440,48 @@ export async function likePost(token: string, id: string) {
   }
 }
 
+//COMMENTS
+
+//CREATE COMMENT
+export async function createComment(
+  itemId: string,
+  comment: string,
+) {
+  try {
+    // const formData = new FormData();
+    // formData.append("author", user)
+    // formData.append("text", comment);
+
+    const data = {
+      text: comment,
+    };
+
+    const res = await api.post(
+      `/blog/posts/${itemId}/comments/`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    console.log("Failed to update avatar", error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error?.response?.data?.error || "Failed to update avatar";
+      toast.error(errorMessage);
+    } else {
+      toast.error("Failed to update avatar");
+    }
+  }
+}
+
+//SEARCHING
+
+//SEARCH
 export async function searchQuery(query: string) {
   try {
     const request = await api.get(`/search/?search=${query}`, {});
