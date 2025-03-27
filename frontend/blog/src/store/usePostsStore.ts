@@ -32,7 +32,7 @@ export const usePostsStore = create<PostState>((set) => ({
   loading: false,
   error: null,
   page: 1,
-  fetchPosts: async (limit: number = 10, page: number = 1) => {
+  fetchPosts: async (limit: number = 100, page: number = 1) => {
     set({ loading: true, error: null });
     try {
       const postsData = await getPosts(limit, page);

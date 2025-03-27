@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     "user_auth",
     "posts",
     "comments",
-    "search"
+    "search",
     #libraries
     "corsheaders",
     "rest_framework",

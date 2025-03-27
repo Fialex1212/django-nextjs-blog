@@ -86,7 +86,7 @@ const Register = () => {
             className="border-b border-black-500 border-style: dashed w-full"
             required
             type="password"
-            placeholder="Password"
+            placeholder="Confirm Password"
           />
           {errors.confirmPassword && (
             <p className="text-red-500">{`${errors.confirmPassword.message}`}</p>

@@ -1,8 +1,14 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.db import models
 from django.core.files.base import ContentFile
 from PIL import Image, ImageDraw, ImageFont
+from django.utils.timezone import now
+from django.utils import timezone
+from datetime import timedelta
+from django.db import models
 import io
+
+def calculate_expires_at():
+    return timezone.now() + timedelta(minutes=3)
 
 class CustomUser(AbstractUser):
     groups = models.ManyToManyField(Group, related_name="custom_users", blank=True)
@@ -42,3 +48,14 @@ class CustomUser(AbstractUser):
         if self.avatar_image:
             return self.avatar_image.url
         return None
+    
+class EmailVerification(models.Model):
+    email = models.EmailField(unique=True)
+    code = models.CharField(max_length=6)
+    expires_at = models.DateTimeField(default=calculate_expires_at)
+    
+    def is_expired(self):
+        return now()> self.expires_at
+    
+    def __str__(self):
+        return f"{self.email} - {self.code}"

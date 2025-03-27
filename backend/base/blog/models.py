@@ -1,13 +1,14 @@
 import uuid
 from django.db import models
 from users.models import CustomUser
+from imagekit.models import ProcessedImageField
 
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = models.TextField(max_length=300)
-    photo = models.ImageField(upload_to="posts/", null=True, blank=True)
+    photo = ProcessedImageField(upload_to="posts/", null=True, blank=True, format="JPEG", options={"quality": 85})
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

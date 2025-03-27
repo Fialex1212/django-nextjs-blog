@@ -25,6 +25,7 @@ interface PostItem {
   author: Author;
   text: string;
   photo: string;
+  comments: [];
   created_at: string;
   count_likes: number;
   is_liked: boolean;
@@ -219,6 +220,13 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         </div>
         <div className="post-text flex gap-[10px]">
           <p>{item.author.username}</p> <p>{item.text}</p>{" "}
+        </div>
+        <div>
+          {item.comments.length === 0 ? (
+            <p>No comments yet</p>
+          ) : (
+            <p><Link href={`/post/${item.id}`}>Look at all comments ({item.comments.length})</Link></p>
+          )}
         </div>
         <div className="w-full">
           <form

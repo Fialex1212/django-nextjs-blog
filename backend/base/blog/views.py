@@ -10,10 +10,10 @@ from .models import Post, PostLike
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
 import logging
 
 logger = logging.getLogger("blog")
-
 
 
 class PostPagination(PageNumberPagination):
@@ -100,26 +100,31 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response({"message": f"Post {pk} was deleted"}, status=status.HTTP_200_OK)
 
-from rest_framework.exceptions import NotFound
-
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        post_id = self.kwargs.get("post_id")
+
+        post_id = self.kwargs.get('post_id')
+        print(f"post_id from URL: {post_id}")
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
             raise NotFound(detail="Post not found.")
         return Comment.objects.filter(post=post)
-    
-    def perform_create(self, serializer):
+
+    def create(self, request, *args, **kwargs):
+
         post_id = self.kwargs.get("post_id")
+
         try:
             post = Post.objects.get(id=post_id)
         except Post.DoesNotExist:
-            raise serializers.ValidationError({"error": "Post not found"})
-
-        serializer.save(post=post, author=self.request.user)
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Добавляем post в данные запроса для сериализатора
+        request.data["post"] = post.id
+        
+        return super().create(request, *args, **kwargs)
 

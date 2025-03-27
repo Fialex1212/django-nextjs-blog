@@ -12,7 +12,10 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'author', 'text', 'post']
     
     def create(self, validated_data):
-        return super().create(validated_data)
+        validated_data.pop("author", None)
+        return Comment.objects.create(
+            author=self.context["request"].user, **validated_data
+        )
 
 
 class PostSerializer(serializers.ModelSerializer):

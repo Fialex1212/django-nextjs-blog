@@ -25,7 +25,7 @@ def get_tokens_for_user(user):
         "access": str(refresh.access_token),
     }
 
-
+            
 class AuthViewSet(ViewSet):
     filter_backends = filters.SearchFilter
     search_fields = ["username"]
