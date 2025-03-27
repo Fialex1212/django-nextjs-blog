@@ -10,6 +10,9 @@ from .models import Post, PostLike
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
+import logging
+
+logger = logging.getLogger("blog")
 
 
 
@@ -30,11 +33,6 @@ class PostViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context["request"] = self.request
         return context
-
-    # @action(detail=False, methods=["post"])
-    # def perform_create(self, serializer):
-    #     print(self.request.headers)
-    #     serializer.save(author=self.request.user)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
