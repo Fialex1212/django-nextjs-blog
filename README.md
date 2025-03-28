@@ -1,5 +1,8 @@
 # **Django & Next.js Blog**
 
+The Django & Next.js Blog is a modern platform built with Django for the backend and Next.js for the frontend. It allows users to register, log in, and manage their profiles, create and interact with blog posts, and engage with others through comments and likes. Featuring advanced search and filtering options, a responsive design, the platform delivers a seamless and secure experience. Built using React, Tailwind CSS, Django REST Framework, and PostgreSQL, it ensures both performance and scalability. Authentication is secured via JSON Web Tokens (JWT).
+
+
 ## **Goal**
 Develop a modern blog platform using Django for the backend and Next.js for the frontend.
 

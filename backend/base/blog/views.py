@@ -1,15 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework import filters
-from .models import Post, Comment
+from .models import Post, PostLike, Comment, CommentLike
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from .models import Post, PostLike
-from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 import logging
 
@@ -113,6 +110,35 @@ class CommentViewSet(viewsets.ModelViewSet):
         except Post.DoesNotExist:
             raise NotFound(detail="Post not found.")
         return Comment.objects.filter(post=post)
+    
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        try:
+            comment = Comment.objects.get(id=pk)
+        except Comment.DoesNotExist:
+            return Response(
+                {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        like, create = CommentLike.objects.get_or_create(user=user, comment=comment)
+
+        if not create:
+            like.delete()
+            return Response({"message": "Like removed"}, status=status.HTTP_200_OK)
+
+        return Response(
+            {
+                "message": "Comment liked",
+                "post": CommentSerializer(comment, context={"request": request}).data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     def create(self, request, *args, **kwargs):
 

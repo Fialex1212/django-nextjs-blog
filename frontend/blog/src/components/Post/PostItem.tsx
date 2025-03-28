@@ -7,11 +7,11 @@ import { format } from "date-fns";
 import { createComment, deletePost, likePost } from "@/utils/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { Heart, MessageCircle, Send, Ellipsis } from "lucide-react";
+import { MessageCircle, Send, Ellipsis } from "lucide-react";
 import { usePostsStore } from "@/store/usePostsStore";
 import { FieldValues, useForm } from "react-hook-form";
 import Popover from "../Popover/Popover";
+import Like from "../Like/Like";
 
 interface Author {
   id: string;
@@ -38,8 +38,10 @@ interface PostProps {
 const PostItem: React.FC<PostProps> = ({ item }) => {
   const formattedDate = format(new Date(item.created_at), "MMMM d, yyyy");
   const { token, user } = useAuthStore();
-  const [likes, setLikes] = useState<number>(Number(item.count_likes) || 0);
-  const [liked, setLiked] = useState<boolean>(item.is_liked || false);
+  const [postLikes, postSetLikes] = useState<number>(
+    Number(item.count_likes) || 0
+  );
+  const [postLiked, postSetLiked] = useState<boolean>(item.is_liked || false);
   const {
     register,
     handleSubmit,
@@ -60,30 +62,6 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
       {item.author?.username.slice(0, 2).toUpperCase()}
     </div>
   );
-
-  const handleLike = async () => {
-    if (!token) {
-      toast.error("You need to be logged in to like a post");
-      return;
-    }
-
-    setLiked((prev) => !prev);
-    setLikes((prev) => (liked ? prev - 1 : prev + 1));
-
-    try {
-      const response = await likePost(token, item.id);
-      console.log("Response from server:", response);
-      if (response.message === "Post liked") {
-        setLiked(true);
-      } else if (response.message === "Like removed") {
-        setLiked(false);
-      }
-    } catch {
-      setLiked((prev) => !prev);
-      setLikes((prev) => (liked ? prev - 1 : prev + 1));
-      toast.error("Failed to like a post");
-    }
-  };
 
   const handleCopy = () => {
     navigator.clipboard
@@ -188,25 +166,14 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
       </div>
       <div className="post__content flex flex-col items-start gap-[10px]">
         <div className="post__buttons flex gap-[6px]">
-          <div className="relative cursor-pointer" onClick={handleLike}>
-            {liked && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0.5 }}
-                animate={{ scale: 1.5, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="absolute inset-0 flex items-center justify-center text-red-500"
-              >
-                <Heart size={24} fill="currentColor" />
-              </motion.div>
-            )}
-            <Heart
-              size={24}
-              className={`transition-colors ${
-                liked ? "text-red-500" : "text-black"
-              }`}
-              fill={liked ? "currentColor" : "none"}
-            />
-          </div>
+          <Like
+            liked={postLiked}
+            setLiked={postSetLiked}
+            likes={postLikes}
+            setLikes={postSetLikes}
+            like={likePost}
+            id={item.id}
+          />
           <button>
             <MessageCircle size={24} />
           </button>
@@ -216,7 +183,7 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         </div>
 
         <div className="flex gap-[10px]">
-          <p>Total likes</p> <p>{likes}</p>
+          <p>Total likes</p> <p>{postLikes}</p>
         </div>
         <div className="post-text flex gap-[10px]">
           <p>{item.author.username}</p> <p>{item.text}</p>{" "}
@@ -225,7 +192,11 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
           {item.comments.length === 0 ? (
             <p>No comments yet</p>
           ) : (
-            <p><Link href={`/post/${item.id}`}>Look at all comments ({item.comments.length})</Link></p>
+            <p>
+              <Link href={`/post/${item.id}`}>
+                Look at all comments ({item.comments.length})
+              </Link>
+            </p>
           )}
         </div>
         <div className="w-full">

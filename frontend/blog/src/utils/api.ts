@@ -443,29 +443,16 @@ export async function likePost(token: string, id: string) {
 //COMMENTS
 
 //CREATE COMMENT
-export async function createComment(
-  itemId: string,
-  comment: string,
-) {
+export async function createComment(itemId: string, comment: string) {
   try {
-    // const formData = new FormData();
-    // formData.append("author", user)
-    // formData.append("text", comment);
-
     const data = {
       text: comment,
     };
-
-    const res = await api.post(
-      `/blog/posts/${itemId}/comments/`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
+    const res = await api.post(`/blog/posts/${itemId}/comments/`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return res.data;
   } catch (error) {
     console.log("Failed to update avatar", error);
@@ -479,12 +466,42 @@ export async function createComment(
   }
 }
 
+//LIKE COMMENT
+export async function likeComment(token: string, id: string) {
+  try {
+    const request = await api.post(
+      `/blog/posts/${id}/comments/${}like/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return request.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage =
+        error.response?.data?.error || "Failed to like a post";
+      if (error.response?.status === 401) {
+        console.log("Unauthorized! Please log in.");
+        toast.error("Unauthorized! Please log in.");
+      } else {
+        console.log(errorMessage);
+      }
+    } else {
+      console.log("Failed to like a post", error);
+    }
+  }
+}
+
 //SEARCHING
 
 //SEARCH
 export async function searchQuery(query: string) {
   try {
-    const request = await api.get(`/search/?search=${query}`, {});
+    const request = await api.get(`/search/?search=${query}/`, {});
     console.log(request.data);
     return request.data;
   } catch (error) {
