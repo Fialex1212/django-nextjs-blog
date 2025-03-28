@@ -470,7 +470,7 @@ export async function createComment(itemId: string, comment: string) {
 export async function likeComment(token: string, id: string) {
   try {
     const request = await api.post(
-      `/blog/posts/${id}/comments/${}like/`,
+      `/blog/comments/${id}/like/`,
       {},
       {
         headers: {

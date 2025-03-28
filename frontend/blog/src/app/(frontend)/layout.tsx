@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import { BeatLoader } from "react-spinners";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { loadUser, user, loading } = useAuthStore();
@@ -23,7 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
       <>
         <Header />
-        <p>Загрузка...</p>
+        <BeatLoader />
         <Footer />
       </>
     );
