@@ -4,13 +4,14 @@ import { format } from "date-fns";
 import { getUserAvatar } from "@/utils/userAvatar";
 import Like from "@/components/Like";
 import { useState } from "react";
-import { likeComment } from "@/utils/api";
+import { deleteComment, likeComment } from "@/utils/api";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ellipsis } from "lucide-react";
 import Popup from "../Popup";
 
 import { CommentProps } from "@/types";
+import { toast } from "sonner";
 
 const Comment = ({ comment }: { comment: CommentProps }) => {
   const [commentLikes, commentSetLikes] = useState<number>(
@@ -19,10 +20,26 @@ const Comment = ({ comment }: { comment: CommentProps }) => {
   const [commentLiked, commentSetLiked] = useState<boolean>(
     comment.is_liked || false
   );
+  const { token } = useAuthStore();
   const [isPopup, setIsPopup] = useState<boolean>(false);
   const { user } = useAuthStore();
 
-  const handleDelete = () => {};
+  const handleDelete = async () => {
+    if (!token) {
+      toast.error("You need to be logged in to delete a post");
+      return;
+    }
+
+    try {
+      await deleteComment(token, comment.id);
+      toast.success(`Comment with id ${comment.id} was deleted`);
+      setIsPopup(false);
+      window.location.reload();
+    } catch (error: unknown) {
+      toast.error("Failed to delete the comment");
+      console.log(error);
+    }
+  };
 
   return (
     <li className="flex flex-col justify-center gap-4 text-[16px] w-full group">

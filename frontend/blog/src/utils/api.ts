@@ -496,6 +496,28 @@ export async function likeComment(token: string, id: string) {
   }
 }
 
+//DELETE POST
+export async function deleteComment(token: string, id: string) {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/blog/comments/${id}/delete/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error deleting post:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+}
+
 //SEARCHING
 
 //SEARCH

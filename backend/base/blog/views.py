@@ -111,6 +111,20 @@ class CommentViewSet(viewsets.ModelViewSet):
             raise NotFound(detail="Post not found.")
         return Comment.objects.filter(post=post)
     
+    def create(self, request, *args, **kwargs):
+
+        post_id = self.kwargs.get("post_id")
+
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Добавляем post в данные запроса для сериализатора
+        request.data["post"] = post.id
+        
+        return super().create(request, *args, **kwargs)
+    
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         user = request.user
@@ -139,18 +153,20 @@ class CommentViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED,
         )
-
-    def create(self, request, *args, **kwargs):
-
-        post_id = self.kwargs.get("post_id")
+        
+    @action(detail=True, methods=["delete"], permission_classes=[IsAuthenticated])
+    def delete(self, request, pk=None):
+        user = request.user
 
         try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Добавляем post в данные запроса для сериализатора
-        request.data["post"] = post.id
-        
-        return super().create(request, *args, **kwargs)
+            comment = Comment.objects.get(id=pk)
+        except Comment.DoesNotExist:
+            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        if user != comment.author:
+            return Response({"error": "You are not the author of this Comment"}, status=status.HTTP_403_FORBIDDEN)
+
+       
+        comment.delete()
+
+        return Response({"message": f"Comment {pk} was deleted"}, status=status.HTTP_200_OK)

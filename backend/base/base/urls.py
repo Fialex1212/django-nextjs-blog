@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
-from blog.views import CommentViewSet
 
 urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # Генерация OpenAPI схемы
@@ -13,9 +12,4 @@ urlpatterns = [
     path("api/", include("users.urls")),
     path("api/blog/", include("blog.urls")),
     path("api/", include("search.urls")),
-    path(
-        'api/blog/comments/<uuid:pk>/like/',
-        CommentViewSet.as_view({'post': 'like'}),
-        name='comment-like',
-    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
