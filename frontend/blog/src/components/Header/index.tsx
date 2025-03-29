@@ -23,11 +23,11 @@ const Header = () => {
     <>
       <header className="container py-[20px] flex justify-between">
         <Link className="text-[32px]" href={"/"}>
-          My Blog
+        Blog
         </Link>
         <SearchBar />
         {user ? (
-          <div className="user__interface flex justify-end gap-[40px] w-[115px]">
+          <div className="user__interface flex justify-end gap-[40px]">
             <div className="avatar__wrapper">
               <Link href={`/profile/you`}>{userAvatar}</Link>
             </div>

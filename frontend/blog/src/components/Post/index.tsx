@@ -10,14 +10,14 @@ import { toast } from "sonner";
 import { MessageCircle, Send, Ellipsis } from "lucide-react";
 import { usePostsStore } from "@/store/usePostsStore";
 import { FieldValues, useForm } from "react-hook-form";
-import Popover from "../Popover/Popover";
-import Like from "../Like/Like";
+import Like from "../Like";
+import Popup from "../Popup";
 
 interface Author {
   id: string;
   username: string;
   email: string;
-  avatar?: string;
+  avatar: string | null;
 }
 
 interface Comment {
@@ -51,6 +51,7 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
     Number(item.count_likes) || 0
   );
   const [postLiked, postSetLiked] = useState<boolean>(item.is_liked || false);
+  const [isPopup, setIsPopup] = useState<boolean>(false)
   const {
     register,
     handleSubmit,
@@ -122,43 +123,42 @@ const PostItem: React.FC<PostProps> = ({ item }) => {
         <time dateTime={item.created_at} className="post-date mr-auto">
           {formattedDate}
         </time>
-        <Popover
-          content={
-            <ul className="post__menu flex flex-col gap-[10px] items-center ">
-              {item.author.id == user?.id ? (
-                <>
-                  <li>
-                    <Link
-                      className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
-                      href={`/post/${item.id}/update`}
-                    >
-                      Update
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
-                      onClick={handleDelete}
-                    >
-                      Delete
-                    </button>
-                  </li>
-                </>
-              ) : (
+        <button className="w-[40px] h-[40px]" onClick={() => setIsPopup(true)}>
+          <Ellipsis />
+        </button>
+        <Popup isOpen={isPopup} onClose={() => setIsPopup(false)}>
+          <ul className="post__menu flex flex-col gap-[10px] items-center ">
+            {item.author.id == user?.id ? (
+              <>
+                <li>
+                  <Link
+                    className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+                    href={`/post/${item.id}/update`}
+                  >
+                    Update
+                  </Link>
+                </li>
                 <li>
                   <button
                     className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
                     onClick={handleDelete}
                   >
-                    Do not recommend me
+                    Delete
                   </button>
                 </li>
-              )}
-            </ul>
-          }
-        >
-          <Ellipsis />
-        </Popover>
+              </>
+            ) : (
+              <li>
+                <button
+                  className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+                  onClick={handleDelete}
+                >
+                  Do not recommend me
+                </button>
+              </li>
+            )}
+          </ul>
+        </Popup>
       </div>
       <div className="image__wrapper mb-[6px]">
         <Link href={`/post/${item.id}`}>

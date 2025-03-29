@@ -5,7 +5,7 @@ interface Author {
   id: string;
   username: string;
   email: string;
-  avatar?: string;
+  avatar: string | null;
 }
 
 interface Comment {

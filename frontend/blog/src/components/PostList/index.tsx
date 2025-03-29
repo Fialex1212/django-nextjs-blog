@@ -1,5 +1,5 @@
 import React from "react";
-import PostItem from "./PostItem";
+import PostItem from "../Post";
 import { usePostsStore } from "@/store/usePostsStore";
 
 const PostList = () => {

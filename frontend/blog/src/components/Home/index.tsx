@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { usePostsStore } from "@/store/usePostsStore";
-import PostList from "../Post/PostList";
+import PostList from "../PostList";
 import Spinner from "../Spinner";
 import ErrorMessage from "../ErrorMessage";
 

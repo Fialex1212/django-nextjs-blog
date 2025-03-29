@@ -50,7 +50,7 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
         toast.success("Post updated successfully");
         onUpdate(response.text, response.photo);
       }
-      router.push(`/post/${postId}`)
+      router.push(`/post/${postId}`);
     } catch {
       toast.error("Failed to update post");
     } finally {

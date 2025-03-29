@@ -1,16 +1,16 @@
 "use client";
-import Comment from "./Comment/Comment";
+import Comment from "../Comment";
 
-interface Author {
+interface User {
   id: string;
   username: string;
   email: string;
-  avatar?: string;
+  avatar: string | null 
 }
 
 interface Comment {
   id: string;
-  author: Author;
+  author: User;
   text: string;
   created_at: string;
   count_likes: number;

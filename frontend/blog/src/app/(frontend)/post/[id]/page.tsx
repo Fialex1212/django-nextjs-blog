@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import PostItem from "@/components/Post/PostItem";
+import PostItem from "@/components/Post";
 import { useParams } from "next/navigation";
-import CommentsList from "@/components/Comments/CommentsList";
+import CommentsList from "@/components/CommentsList";
 import { usePostStore } from "@/store/usePostStore";
 import Loading from "@/components/Loading";
 import ErrorMessage from "@/components/ErrorMessage";

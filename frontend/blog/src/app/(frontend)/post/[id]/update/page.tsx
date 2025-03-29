@@ -3,7 +3,7 @@
 import ErrorMessage from "@/components/ErrorMessage";
 import Loading from "@/components/Loading";
 import NoPost from "@/components/NoPost";
-import UpdatePost from "@/components/Post/UpdatePost";
+import UpdatePost from "@/components/UpdatePost";
 import { usePostStore } from "@/store/usePostStore";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";

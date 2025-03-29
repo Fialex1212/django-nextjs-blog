@@ -5,6 +5,16 @@ interface User {
   id: string;
   username: string;
   email: string;
+  avatar: string | null;
+}
+
+interface Comment {
+  id: string;
+  author: User;
+  text: string;
+  created_at: string;
+  count_likes: number;
+  is_liked: boolean;
 }
 
 interface Post {
@@ -12,8 +22,8 @@ interface Post {
   author: User;
   text: string;
   photo: string;
+  comments: Comment[];
   created_at: string;
-  updated_at: string;
   count_likes: number;
   is_liked: boolean;
 }
