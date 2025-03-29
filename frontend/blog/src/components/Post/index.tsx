@@ -12,39 +12,9 @@ import { usePostsStore } from "@/store/usePostsStore";
 import { FieldValues, useForm } from "react-hook-form";
 import Like from "../Like";
 import Popup from "../Popup";
+import { PostProps } from "@/types";
 
-interface Author {
-  id: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
-
-interface Comment {
-  id: string;
-  author: Author;
-  text: string;
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
-
-interface PostItem {
-  id: string;
-  author: Author;
-  text: string;
-  photo: string;
-  comments: Comment[];
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
-
-interface PostProps {
-  item: PostItem;
-}
-
-const PostItem: React.FC<PostProps> = ({ item }) => {
+const PostItem = ({ item }: {item: PostProps}) => {
   const formattedDate = format(new Date(item.created_at), "MMMM d, yyyy");
   const { token, user } = useAuthStore();
   const [postLikes, postSetLikes] = useState<number>(

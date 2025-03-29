@@ -1,35 +1,9 @@
+import { PostProps } from "@/types";
 import { getPosts } from "@/utils/api";
 import { create } from "zustand";
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
-
-interface Comment {
-  id: string;
-  author: User;
-  text: string;
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
-
-interface Post {
-  id: string;
-  author: User;
-  text: string;
-  photo: string;
-  comments: Comment[];
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
-
 interface PostState {
-  posts: Post[];
+  posts: PostProps[];
   loading: boolean;
   error: string | null;
   page: number;

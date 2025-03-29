@@ -5,15 +5,7 @@ import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import React from "react";
-
-interface LikeProps {
-  liked: boolean;
-  likes: number;
-  setLiked: (liked: boolean) => void;
-  setLikes: (likes: number) => void;
-  like: (token: string, id: string) => Promise<{ message: string }>; //This is some special func in api to like post or comment depends of useage
-  id: string;
-}
+import {LikeProps} from "@/types"
 
 const Like: React.FC<LikeProps> = ({
   liked,

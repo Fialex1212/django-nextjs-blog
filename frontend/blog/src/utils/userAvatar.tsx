@@ -1,13 +1,7 @@
+import { UserProps } from "@/types";
 import Image from "next/image";
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
-
-export const getUserAvatar = (user: User) => {
+export const getUserAvatar = (user: UserProps) => {
   if (user?.avatar) {
     return (
       <Image

@@ -1,4 +1,4 @@
-import Search from "@/components/Search/Search";
+import Search from "@/components/Search";
 
 export default function SearchPage() {
   return (

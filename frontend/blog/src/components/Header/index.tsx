@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
-import SearchBar from "../SearchBar/SearchBar";
+import SearchBar from "../SearchBar";
 
 const Header = () => {
   const { user } = useAuthStore();

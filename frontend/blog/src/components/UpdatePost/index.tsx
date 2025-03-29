@@ -6,13 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { updatePost } from "@/utils/api";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-interface UpdatePostProps {
-  postId: string;
-  initialText: string;
-  initialPhoto?: string;
-  onUpdate: (updatedText: string, updatedPhoto?: string) => void;
-}
+import { UpdatePostProps } from "@/types";
 
 const UpdatePost: React.FC<UpdatePostProps> = ({
   postId,

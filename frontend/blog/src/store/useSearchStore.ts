@@ -1,25 +1,10 @@
+import { PostProps, UserProps } from "@/types";
 import { searchQuery } from "@/utils/api";
 import { create } from "zustand";
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  avatar?: string;
-}
-
-interface Post {
-  id: string;
-  author: User;
-  text: string;
-  photo: string;
-  created_at: string;
-  updated_at: string;
-}
-
 interface SearchState {
   query: string;
-  result: { users: User[]; posts: Post[] };
+  result: { users: UserProps[]; posts: PostProps[] };
   loading: boolean;
   error: string | null;
   setQuery: (query: string) => void;

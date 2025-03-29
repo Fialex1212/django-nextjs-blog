@@ -1,22 +1,16 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
 import { getUser } from "../utils/api";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
+import { UserProps } from "@/types";
 
 interface AuthState {
-  user: User | null;
+  user: UserProps | null;
   token: string | null;
   refresh_token: string | null;
   rewriteToken: (token: string) => void;
   rewriteRefreshToken: (refresh_token: string) => void;
   loading: boolean;
-  login: (token: string, refresh_token: string, user: User) => void;
+  login: (token: string, refresh_token: string, user: UserProps) => void;
   logout: () => void;
   loadUser: () => Promise<void>;
 }

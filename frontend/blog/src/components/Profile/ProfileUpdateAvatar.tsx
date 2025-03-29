@@ -4,11 +4,7 @@ import Modal from "react-modal";
 import { uploadAvatar } from "@/utils/api";
 import { toast } from "sonner";
 import Image from "next/image";
-
-interface ProfileUpdateAvatarProps {
-  closeModal: () => void;
-  isModalOpen: boolean;
-}
+import { ProfileUpdateAvatarProps } from "@/types";
 
 const ProfileUpdateAvatar: React.FC<ProfileUpdateAvatarProps> = ({
   closeModal,

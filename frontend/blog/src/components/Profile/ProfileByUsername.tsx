@@ -1,18 +1,13 @@
 "use client";
 
+import { UserProps } from "@/types";
 import { getUserDetail } from "@/utils/api";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface User {
-  username: string;
-  email: string;
-  avatar: string;
-}
-
 const ProfileByUsername = ({ username }: { username: string }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProps | null>(null);
   const [loading, setLoading] = useState(true);
 
   const userAvatar = user?.avatar ? (

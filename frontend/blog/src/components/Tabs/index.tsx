@@ -1,10 +1,6 @@
 "use client";
 
-interface TabsProps{
-  selected: string;
-  setSelected: (value: string) => void;
-  tabsOptions: string[];
-}
+import { TabsProps } from "@/types";
 
 const Tabs: React.FC<TabsProps> = ({ selected, setSelected, tabsOptions }) => {
   return (

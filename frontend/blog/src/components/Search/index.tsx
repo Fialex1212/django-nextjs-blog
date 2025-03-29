@@ -3,7 +3,7 @@
 import { useSearchStore } from "@/store/useSearchStore";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import Tabs from "../Tabs/Tabs";
+import Tabs from "../Tabs";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";

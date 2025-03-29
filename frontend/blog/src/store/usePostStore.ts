@@ -1,35 +1,9 @@
 import { create } from "zustand";
 import { getPost } from "@/utils/api";
-
-interface Author {
-  id: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-}
-
-interface Comment {
-  id: string;
-  author: Author;
-  text: string;
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
-
-interface Post {
-  id: string;
-  author: Author;
-  text: string;
-  photo: string;
-  comments: Comment[];
-  created_at: string;
-  count_likes: number;
-  is_liked: boolean;
-}
+import { PostProps } from "@/types";
 
 interface PostState {
-  post: Post | null;
+  post: PostProps | null;
   loading: boolean;
   error: string | null;
   fetchPost: (postId: string | string[] | undefined) => Promise<void>;
@@ -53,7 +27,9 @@ export const usePostStore = create<PostState>((set) => ({
     } catch (err: unknown) {
       console.error("Error fetching post:", err);
       const errorMessage =
-        err instanceof Error ? err.message || "Failed to fetch post" : "Unknown error occurred";
+        err instanceof Error
+          ? err.message || "Failed to fetch post"
+          : "Unknown error occurred";
       set({ error: errorMessage, loading: false });
     }
   },

@@ -1,12 +1,7 @@
 "use client";
 
+import { PopupProps } from "@/types";
 import { useEffect, useRef } from "react";
-
-interface PopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
 
 const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
   const PopupRef = useRef<HTMLDivElement | null>(null);
