@@ -501,10 +501,11 @@ export async function likeComment(token: string, id: string) {
 //SEARCH
 export async function searchQuery(query: string) {
   try {
-    const request = await api.get(`/search/?search=${query}/`, {});
-    console.log(request.data);
-    return request.data;
+    const response = await api.get(`/search/?search=${query}`, {});
+    console.log("API Response:", response.data);
+    return response.data;
   } catch (error) {
     console.log("Failed to search", error);
+    throw error;
   }
 }

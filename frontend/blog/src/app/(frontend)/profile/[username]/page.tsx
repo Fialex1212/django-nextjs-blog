@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import ProfileByUsername from "@/components/Profile/ProfileByUsername";
 

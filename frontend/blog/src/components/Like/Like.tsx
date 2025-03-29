@@ -6,7 +6,23 @@ import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import React from "react";
 
-const Like = ({ liked, setLiked, setLikes, likes, like, id }) => {
+interface LikeProps {
+  liked: boolean;
+  likes: number;
+  setLiked: (liked: boolean) => void;
+  setLikes: (likes: number) => void;
+  like: (token: string, id: string) => Promise<{ message: string }>; //This is some special func in api to like post or comment depends of useage
+  id: string;
+}
+
+const Like: React.FC<LikeProps> = ({
+  liked,
+  setLiked,
+  setLikes,
+  likes,
+  like,
+  id,
+}) => {
   const { token } = useAuthStore();
 
   const handleLike = async () => {
@@ -32,7 +48,7 @@ const Like = ({ liked, setLiked, setLikes, likes, like, id }) => {
         setLikes(newLikesCount); // Correctly update the count if the like was removed
       }
     } catch {
-      // If there is an error, revert the state to its original values
+      // If there is an error revert the state to its original values
       setLiked(liked);
       setLikes(likes);
       toast.error("Failed to like a post");

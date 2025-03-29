@@ -20,12 +20,21 @@ interface Author {
   avatar?: string;
 }
 
+interface Comment {
+  id: string;
+  author: Author;
+  text: string;
+  created_at: string;
+  count_likes: number;
+  is_liked: boolean;
+}
+
 interface PostItem {
   id: string;
   author: Author;
   text: string;
   photo: string;
-  comments: [];
+  comments: Comment[];
   created_at: string;
   count_likes: number;
   is_liked: boolean;

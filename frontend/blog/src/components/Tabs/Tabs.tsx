@@ -1,6 +1,12 @@
 "use client";
 
-const Tabs = ({ selected, setSelected, tabsOptions}) => {
+interface TabsProps{
+  selected: string;
+  setSelected: (value: string) => void;
+  tabsOptions: string[];
+}
+
+const Tabs: React.FC<TabsProps> = ({ selected, setSelected, tabsOptions }) => {
   return (
     <div className="flex w-72 p-1 bg-gray-200 rounded-lg shadow">
       {tabsOptions.map((option) => (

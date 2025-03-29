@@ -5,6 +5,7 @@ interface User {
   id: string;
   username: string;
   email: string;
+  avatar?: string;
 }
 
 interface Post {
@@ -39,6 +40,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
 
     try {
       const data = await searchQuery(query);
+
       set({ result: data, loading: false });
     } catch (error) {
       set({ error: "Failed to fetch search results", loading: false });

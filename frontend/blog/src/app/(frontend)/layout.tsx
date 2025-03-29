@@ -1,10 +1,10 @@
 "use client";
+
 import { useEffect } from "react";
-import { useAuthStore } from "../../store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
-import { BeatLoader } from "react-spinners";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { loadUser, user, loading } = useAuthStore();
@@ -19,16 +19,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       router.push("/auth/login");
     }
   }, [loading, user, router]);
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <BeatLoader />
-        <Footer />
-      </>
-    );
-  }
 
   return (
     <>

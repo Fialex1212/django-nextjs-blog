@@ -47,7 +47,7 @@ const Popover: React.FC<PopoverProps> = ({ children, content }) => {
         <div
           id="popover-content"
           ref={popoverRef}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-300 shadow-lg rounded-md p-4 z-50 whitespace-nowrap"
+          className="absolute top-full left-1/2 mt-2 bg-white border border-gray-300 shadow-lg rounded-md p-4 z-100 whitespace-nowrap"
           role="dialog"
           aria-modal="true"
         >

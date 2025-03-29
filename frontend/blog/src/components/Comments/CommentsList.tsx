@@ -8,11 +8,7 @@ interface Author {
   avatar?: string;
 }
 
-interface CommentProps {
-  comments: CommentProps[];
-}
-
-interface CommentProps {
+interface Comment {
   id: string;
   author: Author;
   text: string;
@@ -21,7 +17,7 @@ interface CommentProps {
   is_liked: boolean;
 }
 
-const CommentsList: React.FC<CommentProps> = ({ comments }) => {
+const CommentsList: React.FC<{ comments: Comment[] }> = ({ comments }) => {
   return (
     <div className="overflow-y-auto ">
       <ul className="comments flex flex-col items-start justify-start w-[400px] gap-4">
