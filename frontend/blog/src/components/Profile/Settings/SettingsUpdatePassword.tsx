@@ -37,7 +37,7 @@ const SettingsUpdatePassword = () => {
         className="flex flex-col gap-[50px] max-w-[400px] w-full"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <label className="relative block">
+        <label className="relative block mb-[20px]">
           <input
             {...register("oldPassword", {
               required: "Email is required",

@@ -3,6 +3,7 @@ from .models import Post
 from comments.serializers import CommentSerializer
 from users.serializers import UserSerializer
 
+
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     comments = CommentSerializer(read_only=True, many=True)
@@ -30,7 +31,7 @@ class PostSerializer(serializers.ModelSerializer):
         if not request:
             print("Request is None")
             return False
-        user = self.context.get("request").user #error user is 401 but token is okay 
+        user = self.context.get("request").user  # error user is 401 but token is okay
         if not user.is_authenticated:
             print("User is not authenticated")
             return False

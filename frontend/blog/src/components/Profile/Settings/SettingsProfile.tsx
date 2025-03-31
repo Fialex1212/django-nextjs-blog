@@ -32,7 +32,7 @@ const SettingsProfile = () => {
   return (
     <div className="flex flex-col items-center justify-center pt-[50px] min-h-[calc(100vh-236px)]">
       <div className="user flex flex-col items-center mb-[50px]">
-        <div className="group relative">
+        <div className="group relative mb-[20px]">
           {userAvatar}
           <button
             onClick={handleChangeAvatar}

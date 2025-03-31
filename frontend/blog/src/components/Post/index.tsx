@@ -25,9 +25,12 @@ const PostItem = ({ item }: { item: PostProps }) => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     reset,
   } = useForm();
+
+  const comment = watch("comment", "");
 
   const userAvatar = item.author?.avatar ? (
     <Image
@@ -68,6 +71,11 @@ const PostItem = ({ item }: { item: PostProps }) => {
   const onSubmit = async (data: FieldValues) => {
     console.log(data.comment);
 
+    if (!data.comment || data.comment.trim().length === 0) {
+      toast.info("You must write something in comment filed");
+      return;
+    }
+
     if (!user?.id) {
       toast.error("User's current email is not available.");
       return;
@@ -87,7 +95,7 @@ const PostItem = ({ item }: { item: PostProps }) => {
       <div className="post-header flex items-center gap-[10px] mb-[10px]">
         <div className="author-info flex items-center gap-[10px]">
           <Link href={`/profile/${item.author.username}`}>{userAvatar}</Link>
-          <Link href={`/profile/${item.author.username}`}>
+          <Link className="font-bold" href={`/profile/${item.author.username}`}>
             {item.author.username}
           </Link>
         </div>
@@ -145,7 +153,7 @@ const PostItem = ({ item }: { item: PostProps }) => {
         </Link>
       </div>
       <div className="post__content flex flex-col items-start gap-[10px]">
-        <div className="post__buttons flex gap-[6px]">
+        <div className="post__buttons flex gap-[10px]">
           <Like
             liked={postLiked}
             setLiked={postSetLiked}
@@ -162,13 +170,13 @@ const PostItem = ({ item }: { item: PostProps }) => {
           </button>
         </div>
 
-        <div className="flex gap-[10px]">
-          <p>Total likes</p> <p>{postLikes}</p>
+        <div className="flex gap-[10px] font-bold">
+          <p>Total likes {postLikes}</p>
         </div>
         <div className="post-text flex gap-[10px]">
-          <p>{item.author.username}</p> <p>{item.text}</p>{" "}
+          <p className="font-bold">{item.author.username}</p> <p>{item.text}</p>{" "}
         </div>
-        <div>
+        <div className="text-zinc-500">
           {item.comments.length === 0 ? (
             <p>No comments yet</p>
           ) : (
@@ -195,9 +203,11 @@ const PostItem = ({ item }: { item: PostProps }) => {
                 <p className="text-red-500">{`${errors.comment.message}`}</p>
               )}
             </label>
-            <button type="submit" disabled={isSubmitting}>
-              publish
-            </button>
+            {comment.length > 0 && (
+              <button type="submit" disabled={isSubmitting}>
+                publish
+              </button>
+            )}
           </form>
         </div>
       </div>

@@ -51,7 +51,7 @@ const SettingsUpdateUsername = () => {
         className="flex flex-col gap-[50px] max-w-[400px] w-full"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <label className="relative block">
+        <label className="relative block mb-[20px]">
           <input
             {...register("username", {
               required: "Username is required",

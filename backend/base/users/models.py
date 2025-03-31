@@ -7,12 +7,16 @@ from datetime import timedelta
 from django.db import models
 import io
 
+
 def calculate_expires_at():
     return timezone.now() + timedelta(minutes=3)
 
+
 class CustomUser(AbstractUser):
     groups = models.ManyToManyField(Group, related_name="custom_users", blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name="custom_users_permissions", blank=True)
+    user_permissions = models.ManyToManyField(
+        Permission, related_name="custom_users_permissions", blank=True
+    )
     avatar_image = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
     def generate_avatar(self):
@@ -36,7 +40,9 @@ class CustomUser(AbstractUser):
 
         image_io = io.BytesIO()
         img.save(image_io, format="PNG")
-        self.avatar_image.save(f"{self.username}_profile.png", ContentFile(image_io.getvalue()), save=False)
+        self.avatar_image.save(
+            f"{self.username}_profile.png", ContentFile(image_io.getvalue()), save=False
+        )
 
     def save(self, *args, **kwargs):
         if not self.avatar_image:

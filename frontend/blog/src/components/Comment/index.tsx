@@ -5,7 +5,6 @@ import { getUserAvatar } from "@/utils/userAvatar";
 import Like from "@/components/Like";
 import { useState } from "react";
 import { deleteComment, likeComment } from "@/utils/api";
-import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ellipsis } from "lucide-react";
 import Popup from "../Popup";
@@ -65,14 +64,6 @@ const Comment = ({ comment }: { comment: CommentProps }) => {
             {comment.author.id == user?.id ? (
               <>
                 <li>
-                  <Link
-                    className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
-                    href={`/post/${comment.id}/update`}
-                  >
-                    Update
-                  </Link>
-                </li>
-                <li>
                   <button
                     className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
                     onClick={handleDelete}
@@ -84,10 +75,15 @@ const Comment = ({ comment }: { comment: CommentProps }) => {
             ) : (
               <li>
                 <button className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md">
-                  Do not recommend me
+                  Some button
                 </button>
               </li>
             )}
+            <li>
+              <button className="cursor-pointer group relative flex gap-1.5 px-8 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md">
+                Do not recommend me
+              </button>
+            </li>
           </ul>
         </Popup>
       </div>

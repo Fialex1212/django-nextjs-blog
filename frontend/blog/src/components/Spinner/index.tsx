@@ -2,7 +2,7 @@ import React from "react";
 
 const Spinner = () => {
   return (
-    <div className="text-center">
+    <div className="text-center flex justify-center items-center min-h-[calc(100vh-236px)]">
       <div role="status">
         <svg
           aria-hidden="true"

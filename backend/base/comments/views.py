@@ -1,15 +1,17 @@
 from rest_framework import viewsets, status
-from .models import Post, Comment, CommentLike
+from .models import Comment, CommentLike
 from .serializers import CommentSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import NotFound
+from drf_spectacular.utils import extend_schema
 import logging
 
 logger = logging.getLogger("comments")
 
+
 # Create your views here.
+@extend_schema(tags=["Comments"])
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -28,11 +30,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
-            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = CommentSerializer(comment, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         user = request.user

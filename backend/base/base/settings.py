@@ -17,6 +17,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 AUTH_USER_MODEL = "users.CustomUser"
+SOCIAL_AUTH_USER_MODEL = "users.CustomUser"
 
 
 INSTALLED_APPS = [
@@ -26,16 +27,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #apps
+    # apps
     "users",
     "user_auth",
     "posts",
     "comments",
     "search",
-    #libraries
+    # libraries
     "corsheaders",
+    "social_django",
     "rest_framework",
-    'drf_spectacular',
+    "drf_spectacular",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
 ]
@@ -67,8 +69,8 @@ TEMPLATES = [
     },
 ]
 
-#DATABASE
-#PostgreSQL
+# DATABASE
+# PostgreSQL
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
@@ -80,7 +82,7 @@ TEMPLATES = [
 #     }
 # }
 
-#Default database
+# Default database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -103,7 +105,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-#MEDIA&STATIC
+# GOOGLE OAUTH2
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.google.GoogleOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_CLIENT_ID")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+# MEDIA&STATIC
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STATIC_URL = "/static/"
@@ -119,7 +130,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
@@ -133,63 +144,68 @@ SIMPLE_JWT = {
 }
 
 
-#EMAIL SMTP
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL SMTP
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-#SWAGGER UI
+# SWAGGER UI
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'My API',
-    'DESCRIPTION': 'API documentation',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "My API",
+    "DESCRIPTION": "API documentation",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "TAGS": [
+        {"name": "Users"},
+        {"name": "Posts"},
+        {"name": "Comments"},
+        {"name": "Search"},
+    ],
 }
 
-#LOGGING
+# LOGGING
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'INFO',
-            'formatter': 'simple',
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "simple",
         },
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'blog.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 5,         # Keep 5 backup files
-            'level': 'DEBUG',
-            'formatter': 'simple',
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "blog.log",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 5,  # Keep 5 backup files
+            "level": "DEBUG",
+            "formatter": "simple",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'comments': {  # Custom logger for your comments app
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "comments": {  # Custom logger for your comments app
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": False,
         },
-        
-        'posts': {  # Custom logger for your posts app
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
+        "posts": {  # Custom logger for your posts app
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": False,
         },
     },
 }

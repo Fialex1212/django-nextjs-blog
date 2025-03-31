@@ -7,8 +7,10 @@ from posts.models import Post
 from users.models import CustomUser
 from posts.serializers import PostSerializer
 from users.serializers import UserSerializer
+from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(tags=["Search"])
 class GlobalSearchViewSet(ViewSet):
     def list(self, request):
         query = request.GET.get("search", "").strip().lower()

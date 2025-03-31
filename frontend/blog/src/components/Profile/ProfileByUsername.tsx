@@ -51,7 +51,7 @@ const ProfileByUsername = ({ username }: { username: string }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-236px)] ">
       <div className="user flex flex-col items-center mb-[50px]">
-        {userAvatar}
+        <div className="group relative mb-[20px]">{userAvatar}</div>
         <h3 className="user__email text-[22px]">{user?.email}</h3>
         <h3 className="user__username text-[22px]">{user?.username}</h3>
       </div>
