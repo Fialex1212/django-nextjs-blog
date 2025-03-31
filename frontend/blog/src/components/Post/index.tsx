@@ -14,14 +14,14 @@ import Like from "../Like";
 import Popup from "../Popup";
 import { PostProps } from "@/types";
 
-const PostItem = ({ item }: {item: PostProps}) => {
+const PostItem = ({ item }: { item: PostProps }) => {
   const formattedDate = format(new Date(item.created_at), "MMMM d, yyyy");
   const { token, user } = useAuthStore();
   const [postLikes, postSetLikes] = useState<number>(
     Number(item.count_likes) || 0
   );
   const [postLiked, postSetLiked] = useState<boolean>(item.is_liked || false);
-  const [isPopup, setIsPopup] = useState<boolean>(false)
+  const [isPopup, setIsPopup] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -76,6 +76,7 @@ const PostItem = ({ item }: {item: PostProps}) => {
     try {
       await createComment(item.id, data.comment);
       toast.success("Comment was successfuly ");
+      window.location.reload();
     } catch {}
 
     reset();
@@ -153,9 +154,9 @@ const PostItem = ({ item }: {item: PostProps}) => {
             like={likePost}
             id={item.id}
           />
-          <button>
+          <Link href={`/post/${item.id}`}>
             <MessageCircle size={24} />
-          </button>
+          </Link>
           <button onClick={handleCopy}>
             <Send size={24} />
           </button>

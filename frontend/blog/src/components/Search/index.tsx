@@ -87,14 +87,23 @@ const Search = () => {
             <>
               <h2>Posts</h2>
               {result.posts.length > 0 ? (
-                <ul className="space-y-2">
+                <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {result.posts.map((post) => (
-                    <li key={post.id}>
+                    <li className="w-full" key={post.id}>
                       <Link
                         className="text-blue-500 hover:underline"
                         href={`/post/${post.id}`}
                       >
-                        {post.text}
+                        <div className="w-full h-[170px] overflow-hidden rounded-lg">
+                          <Image
+                            src={post.photo}
+                            alt={post.text}
+                            width={250}
+                            height={250}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <p>{post.text}</p>
                       </Link>
                     </li>
                   ))}
