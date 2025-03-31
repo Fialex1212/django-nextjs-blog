@@ -3,9 +3,9 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
-from blog.models import Post
+from posts.models import Post
 from users.models import CustomUser
-from blog.serializers import PostSerializer
+from posts.serializers import PostSerializer
 from users.serializers import UserSerializer
 
 

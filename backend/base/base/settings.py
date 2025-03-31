@@ -27,8 +27,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     #apps
-    "blog", #TODO Decompose into posts and comments
-
     "users",
     "user_auth",
     "posts",
@@ -182,7 +180,13 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'blog': {  # Custom logger for your blog app
+        'comments': {  # Custom logger for your comments app
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        
+        'posts': {  # Custom logger for your posts app
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,

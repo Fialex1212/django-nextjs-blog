@@ -14,7 +14,7 @@ const PostList = () => {
               <PostItem item={post} />
             </div>
 
-            <div className="w-full h-[2px] bg-gray-500"></div>
+            <div className="w-full h-[1px] bg-black"></div>
           </li>
         ))
       ) : (

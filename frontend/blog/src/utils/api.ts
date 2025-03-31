@@ -60,8 +60,7 @@ api.interceptors.response.use(
   }
 );
 
-//AUTH
-
+//handler for adding token to request
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
   if (token) {
@@ -308,7 +307,7 @@ export async function uploadAvatar(token: string, formData: FormData) {
 //GET POSTS
 export async function getPosts(limit = 10, page = 1) {
   try {
-    const res = await api.get(`/blog/posts/`, {
+    const res = await api.get(`/posts/`, {
       params: {
         limit,
         page,
@@ -325,7 +324,7 @@ export async function getPosts(limit = 10, page = 1) {
 //GET POST
 export async function getPost(id: string) {
   try {
-    const res = await api.get(`/blog/posts/${id}/`, {});
+    const res = await api.get(`/posts/${id}/`, {});
     console.log("Fetched posts:", res.data);
     return res.data;
   } catch (error) {
@@ -337,7 +336,7 @@ export async function getPost(id: string) {
 //CREATE POST
 export async function createPost(token: string, data: FormData) {
   try {
-    const res = await api.post(`/blog/posts/`, data, {
+    const res = await api.post(`/posts/`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -369,7 +368,7 @@ export async function updatePost(
 ) {
   try {
     const response = await axios.put(
-      `${API_URL}/blog/posts/${postId}/update_post/`,
+      `${API_URL}/posts/${postId}/update_post/`,
       data,
       {
         headers: {
@@ -393,7 +392,7 @@ export async function updatePost(
 export async function deletePost(token: string, postId: string) {
   try {
     const response = await axios.delete(
-      `${API_URL}/blog/posts/${postId}/delete_post/`,
+      `${API_URL}/posts/${postId}/delete_post/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -415,7 +414,7 @@ export async function deletePost(token: string, postId: string) {
 export async function likePost(token: string, id: string) {
   try {
     const request = await api.post(
-      `/blog/posts/${id}/like/`,
+      `/posts/${id}/like/`,
       {},
       {
         headers: {
@@ -447,8 +446,9 @@ export async function createComment(itemId: string, comment: string) {
   try {
     const data = {
       text: comment,
+      post: itemId,
     };
-    const res = await api.post(`/blog/posts/${itemId}/comments/`, data, {
+    const res = await api.post(`/comments/`, data, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -470,7 +470,7 @@ export async function createComment(itemId: string, comment: string) {
 export async function likeComment(token: string, id: string) {
   try {
     const request = await api.post(
-      `/blog/comments/${id}/like/`,
+      `/comments/${id}/like/`,
       {},
       {
         headers: {
@@ -496,11 +496,35 @@ export async function likeComment(token: string, id: string) {
   }
 }
 
-//DELETE POST
+//UPDATE COMMENT
+export async function updateComment(token: string, id: string, data: FormData) {
+  try {
+    const response = await axios.put(
+      `${API_URL}/comments/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating post:",
+      error.response?.data || error.message
+    );
+    throw error.response?.data || error.message;
+  }
+}
+
+//DELETE COMMENT
 export async function deleteComment(token: string, id: string) {
   try {
     const response = await axios.delete(
-      `${API_URL}/blog/comments/${id}/delete/`,
+      `${API_URL}/comments/${id}/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

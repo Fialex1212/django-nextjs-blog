@@ -69,7 +69,7 @@ const SettingsUpdateUsername = () => {
                   "Username can only contain letters, numbers, and underscores",
               },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="text-white p-4 rounded-lg w-full bg-black text-sm font-bold resize-none focus:outline-white focus:bg-opacity-90 focus:text-gray-300"
             type="text"
             placeholder="Username"
           />

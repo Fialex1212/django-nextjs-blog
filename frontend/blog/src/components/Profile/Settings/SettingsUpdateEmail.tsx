@@ -40,7 +40,7 @@ const SettingsUpdateEmail = () => {
     try {
       await updateEmail(user?.username, data.email);
       router.push("/");
-      toast.success("Email was successfuly updated")
+      toast.success("Email was successfuly updated");
     } catch {}
     reset();
   };
@@ -60,7 +60,7 @@ const SettingsUpdateEmail = () => {
                 message: "Please enter a valid email address",
               },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="text-white p-4 rounded-lg w-full bg-black text-sm font-bold resize-none focus:outline-white focus:bg-opacity-90 focus:text-gray-300"
             type="email"
             placeholder="Email"
           />

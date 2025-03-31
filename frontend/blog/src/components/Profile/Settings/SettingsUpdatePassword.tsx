@@ -18,7 +18,6 @@ const SettingsUpdatePassword = () => {
   const { user } = useAuthStore();
 
   const onSubmit = async (data: FieldValues) => {
-
     if (!user) {
       toast.error("User is not available.");
       return;
@@ -27,7 +26,7 @@ const SettingsUpdatePassword = () => {
     try {
       await updatePassword(user?.username, data.newPassword, data.oldPassword);
       router.push("/");
-      toast.success("Password was successfuly updated")
+      toast.success("Password was successfuly updated");
     } catch {}
     reset();
   };
@@ -47,7 +46,7 @@ const SettingsUpdatePassword = () => {
                 message: "Password must be at least 8 characters",
               },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="text-white p-4 rounded-lg w-full bg-black text-sm font-bold resize-none focus:outline-white focus:bg-opacity-90 focus:text-gray-300"
             type="password"
             placeholder="Old password"
           />
@@ -64,7 +63,7 @@ const SettingsUpdatePassword = () => {
                 message: "Password must be at least 8 characters",
               },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="text-white p-4 rounded-lg w-full bg-black text-sm font-bold resize-none focus:outline-white focus:bg-opacity-90 focus:text-gray-300"
             type="password"
             placeholder="New password"
           />
@@ -79,7 +78,7 @@ const SettingsUpdatePassword = () => {
               validate: (value) =>
                 value === getValues("newPassword") || "Password must match",
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="text-white p-4 rounded-lg w-full bg-black text-sm font-bold resize-none focus:outline-white focus:bg-opacity-90 focus:text-gray-300"
             required
             type="password"
             placeholder="Confirm Password"

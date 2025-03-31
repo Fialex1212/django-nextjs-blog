@@ -49,7 +49,7 @@ const ProfileByUsername = ({ username }: { username: string }) => {
   if (!user) return <p className="text-center text-red-500">User not found</p>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-236px)] ">
       <div className="user flex flex-col items-center mb-[50px]">
         {userAvatar}
         <h3 className="user__email text-[22px]">{user?.email}</h3>

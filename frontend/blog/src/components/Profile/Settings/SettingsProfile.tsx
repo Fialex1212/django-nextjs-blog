@@ -30,7 +30,7 @@ const SettingsProfile = () => {
   ); //TODO fix avatar url
 
   return (
-    <div className="flex flex-col items-center justify-center pt-[50px]">
+    <div className="flex flex-col items-center justify-center pt-[50px] min-h-[calc(100vh-236px)]">
       <div className="user flex flex-col items-center mb-[50px]">
         <div className="group relative">
           {userAvatar}

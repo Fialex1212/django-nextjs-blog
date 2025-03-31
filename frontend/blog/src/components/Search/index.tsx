@@ -33,7 +33,7 @@ const Search = () => {
   }
 
   return (
-    <div className="container">
+    <div className="container min-h-[calc(100vh-236px)]">
       <h2 className="text-[50px] text-center mb-[20px]">Searching page</h2>
 
       <div className="flex justify-center">

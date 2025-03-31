@@ -186,7 +186,7 @@ const PostItem = ({ item }: {item: PostProps}) => {
             <label className="w-full">
               <input
                 {...register("comment")}
-                className="border-b border-black-500 border-style: dashed w-full"
+                className="border-black-500 border-style: dashed w-full"
                 type="text"
                 placeholder="Add comment"
               />

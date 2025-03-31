@@ -48,14 +48,3 @@ class CustomUser(AbstractUser):
         if self.avatar_image:
             return self.avatar_image.url
         return None
-    
-class EmailVerification(models.Model):
-    email = models.EmailField(unique=True)
-    code = models.CharField(max_length=6)
-    expires_at = models.DateTimeField(default=calculate_expires_at)
-    
-    def is_expired(self):
-        return now()> self.expires_at
-    
-    def __str__(self):
-        return f"{self.email} - {self.code}"
