@@ -7,19 +7,16 @@ import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useImagePreveiw } from "@/hooks/useImagePreview";
 
 const CreatePost = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    text: "",
-    photo: null as File | null,
-  });
-  const [preview, setPreview] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ text: "" });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const { fetchPosts } = usePostsStore();
   const { token } = useAuthStore();
+
+  const { preview, file, error, handleFileChange } = useImagePreveiw();
 
   const handleTextChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,63 +27,32 @@ const CreatePost = () => {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
-      setError("No file selected.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setError("File size exceeds 5MB.");
-      return;
-    }
-
-    setFormData({
-      ...formData,
-      photo: file,
-    });
-
-    const previewUrl = URL.createObjectURL(file);
-    setPreview(previewUrl);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
-      const data = new FormData();
-      data.append("text", formData.text);
-
-      if (formData.photo) {
-        data.append("photo", formData.photo);
-      }
-
       if (!token) {
         toast.error("You need to be logged in to like a post.");
         throw new Error("No authentication token found.");
       }
 
-      if (!formData.photo) {
-        toast.error("Chose the photo.");
-        throw new Error("Chose the photo.");
+      if (!file) {
+        toast.error("Please select a photo.");
+        throw new Error("Photo is required.");
       }
+
+      const data = new FormData();
+      data.append("text", formData.text);
+      data.append("photo", file);
 
       await createPost(token, data);
 
-      setFormData({ text: "", photo: null });
-      setPreview(null);
-
-      await fetchPosts();
+      setFormData({ text: "" });
       router.push("/");
+      await fetchPosts();
     } catch (error) {
       console.error("Error creating post:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to create post."
-      );
     } finally {
       setLoading(false);
     }
@@ -95,7 +61,10 @@ const CreatePost = () => {
   return (
     <div className="container">
       <div className="flex justify-center items-center min-h-[calc(100vh-236px)]">
-        <form className="flex flex-col items-center gap-4" onSubmit={handleSubmit}>
+        <form
+          className="flex flex-col items-center gap-4"
+          onSubmit={handleSubmit}
+        >
           <div className="w-full">
             <label>
               <textarea

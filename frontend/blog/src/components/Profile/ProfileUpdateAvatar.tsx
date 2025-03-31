@@ -1,54 +1,33 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import { useState } from "react";
 import Modal from "react-modal";
 import { uploadAvatar } from "@/utils/api";
 import { toast } from "sonner";
 import Image from "next/image";
 import { ProfileUpdateAvatarProps } from "@/types";
+import { useImagePreveiw } from "@/hooks/useImagePreview";
 
 const ProfileUpdateAvatar: React.FC<ProfileUpdateAvatarProps> = ({
   closeModal,
   isModalOpen,
 }) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const { token } = useAuthStore();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-
-    if (!selectedFile) {
-      setError("No file selected.");
-      return;
-    }
-
-    if (selectedFile.size > 5 * 1024 * 1024) {
-      setError("File size exceeds 5MB.");
-      return;
-    }
-
-    setFile(selectedFile);
-    setError(null);
-
-    const previewUrl = URL.createObjectURL(selectedFile);
-    setPreview(previewUrl);
-  };
+  const { preview, file, error, handleFileChange } = useImagePreveiw();
 
   const handleUploadAvatar = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.error("Please select an avatar file to upload.");
-      return;
-    }
-
-    if (!token) {
-      toast.error("You need to be logged in to like a post");
-      return;
-    }
-
     try {
+      if (!file) {
+        toast.error("Please select an avatar file to upload.");
+        return;
+      }
+
+      if (!token) {
+        toast.error("You need to be logged in to like a post");
+        return;
+      }
+
       const formData = new FormData();
       formData.append("avatar_image", file);
 
@@ -56,6 +35,7 @@ const ProfileUpdateAvatar: React.FC<ProfileUpdateAvatarProps> = ({
       if (res) {
         console.log("Avatar updated successfully", res);
         closeModal();
+        window.location.reload();
       }
     } catch (error) {
       console.log("Failed to upload avatar", error);
