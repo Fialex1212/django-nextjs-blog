@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # apps
     "users",
-    "user_auth",
     "posts",
     "comments",
     "search",
