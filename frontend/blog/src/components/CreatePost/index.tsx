@@ -60,9 +60,9 @@ const CreatePost = () => {
 
   return (
     <div className="container">
-      <div className="flex justify-center items-center min-h-[calc(100vh-236px)]">
+      <div className="flex flex-col min-h-[calc(100vh-236px)]">
         <form
-          className="flex flex-col items-center gap-4"
+          className="flex flex-col  gap-4"
           onSubmit={handleSubmit}
         >
           <div className="w-full">

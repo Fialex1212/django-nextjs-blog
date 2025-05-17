@@ -39,8 +39,9 @@ const Register = () => {
             {...register("username", {
               required: "Username is required",
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             placeholder="Username"
+            aria-label="Username"
           />
           {errors.username && (
             <p className="text-red-500">{`${errors.username.message}`}</p>
@@ -50,9 +51,10 @@ const Register = () => {
           <input
             {...register("email", { required: "Email is required" })}
             type="email"
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             required
             placeholder="Email"
+            aria-label="Email"
           />
           {errors.email && (
             <p className="text-red-500">{`${errors.email.message}`}</p>
@@ -61,16 +63,26 @@ const Register = () => {
         <label className="relative block">
           <input
             {...register("password", {
-              required: "Username is required",
+              required: "Password is required",
               minLength: {
                 value: 8,
                 message: "Password must be at least 8 characters",
               },
+              maxLength: {
+                value: 23,
+                message: "Password must not exceed 23 characters",
+              },
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                message:
+                  "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+              },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             required
             type="password"
             placeholder="Password"
+            aria-label="Password"
           />
           {errors.password && (
             <p className="text-red-500">{`${errors.password.message}`}</p>
@@ -83,7 +95,7 @@ const Register = () => {
               validate: (value) =>
                 value === getValues("password") || "Password must match",
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             required
             type="password"
             placeholder="Confirm Password"

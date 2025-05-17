@@ -19,12 +19,11 @@ const Login = () => {
   const { login, loginWithGoogle } = useAuthStore();
 
   useEffect(() => {
-    // Проверяем, есть ли Google-токен в URL (после редиректа)
     const urlParams = new URLSearchParams(window.location.search);
     const googleToken = urlParams.get("token");
     if (googleToken) {
       loginWithGoogle(googleToken);
-      window.history.replaceState(null, "", window.location.pathname); // Убираем токен из URL
+      window.history.replaceState(null, "", window.location.pathname);
     }
   }, [loginWithGoogle]);
 
@@ -33,15 +32,20 @@ const Login = () => {
     try {
       const userData = await loginUser(data.username, data.password);
       const user = await getUser();
-      console.log("Refresh token: ", userData.refresh);
-      console.log("Access token: ", userData.access);
-
+      if (process.env.NODE_ENV === "development") {
+        console.debug("Refresh token: ", userData.refresh);
+        console.debug("Access token: ", userData.access);
+      }
       login(userData.access, userData.refresh, user);
       router.push("/");
-    } catch {
-      toast.error("Error");
+      reset();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to login. Please check your credentials.";
+      toast.error(errorMessage);
     }
-    reset();
   };
 
   return (
@@ -53,10 +57,12 @@ const Login = () => {
       >
         <label className="relative block">
           <input
+            id="username"
             {...register("username", { required: "Username is required" })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             type="text"
             placeholder="Username"
+            aria-label="Username"
           />
           {errors.username && (
             <p className="text-red-500">{`${errors.username.message}`}</p>
@@ -64,25 +70,27 @@ const Login = () => {
         </label>
         <label className="relative block">
           <input
+            id="password"
             {...register("password", {
               required: "Password is required",
               minLength: {
-                value: 3,
-                message: "Username must be at least 3 characters",
+                value: 8,
+                message: "Password must be at least 8 characters",
               },
               maxLength: {
                 value: 23,
-                message: "Username must not exceed 23 characters",
+                message: "Password must not exceed 23 characters",
               },
               pattern: {
-                value: /^[a-zA-Z0-9_]+$/,
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
                 message:
-                  "Username can only contain letters, numbers, and underscores",
+                  "Password must contain at least one uppercase letter, one lowercase letter, and one number",
               },
             })}
-            className="border-b border-black-500 border-style: dashed w-full"
+            className="border-b border-black border-style: dashed w-full"
             type="password"
             placeholder="Password"
+            aria-label="Password"
           />
           {errors.password && (
             <p className="text-red-500">{`${errors.password.message}`}</p>
@@ -94,15 +102,6 @@ const Login = () => {
           disabled={isSubmitting}
         >
           Login
-        </button>
-        <button
-          className="cursor-pointer group relative flex justify-center gap-1.5 px-6 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
-          type="submit"
-          disabled={isSubmitting}
-        >
-          <Link href="http://localhost:8000/api/auth/google/login/">
-            Войти через Google
-          </Link>
         </button>
         <div className="flex justify-center gap-[10px] font-semibold">
           <p>Do not have an account?</p>

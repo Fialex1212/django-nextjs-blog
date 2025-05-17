@@ -40,28 +40,28 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token: null, user: null, loading: false });
   },
   loadUser: async () => {
-    console.log("loadUser started, loading:", true);
+    // console.log("loadUser started, loading:", true);
     const token = Cookies.get("accessToken");
     if (!token) {
-      console.log("No token, setting loading false");
+      console.debug("No token, setting loading false");
       set({ loading: false });
       return;
     }
 
     set({ loading: true });
     try {
-      console.log("Fetching user...");
+      // console.log("Fetching user...");
       const user = await getUser();
-      console.log("User fetched:", user);
+      // console.log("User fetched:", user);
       if (!user) throw new Error("No user data returned");
       set({ user, loading: false });
-      console.log("User set, loading false");
+      // console.log("User set, loading false");
     } catch (error) {
       console.error("Failed to fetch user:", error);
       Cookies.remove("refreshToken");
       Cookies.remove("accessToken");
       set({ token: null, user: null, loading: false });
-      console.log("Error handled, loading false");
+      // console.log("Error handled, loading false");
     }
   },
   loginWithGoogle: async (googleToken) => {
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       Cookies.set("refreshToken", refresh, { expires: 7 });
 
       set({ token: access, refresh_token: refresh, user, loading: false });
-      console.log("Auth store:", useAuthStore.getState());
+      // console.log("Auth store:", useAuthStore.getState());
     } catch (error) {
       console.error("Google login failed:", error);
       set({ token: null, user: null, loading: false });

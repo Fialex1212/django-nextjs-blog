@@ -19,13 +19,14 @@ export const usePostsStore = create<PostState>((set) => ({
   page: 1,
   hasMore: true,
   fetchPosts: async (limit: number = 10) => {
-    const { page, hasMore } = usePostsStore.getState();
-    if (!hasMore) return;
+    const { page, hasMore, loading } = usePostsStore.getState();
+    if (!hasMore || loading) return;
+
     set({ loading: true, error: null });
     try {
       const postsData = await getPosts(limit, page);
       const newPosts = postsData?.results ?? [];
-      console.log("Posts data in store:", postsData);
+      // console.log("Posts data in store:", postsData);
 
       if (postsData && postsData.results) {
         set((state) => ({
@@ -38,7 +39,8 @@ export const usePostsStore = create<PostState>((set) => ({
         set({ loading: false });
       }
     } catch (error) {
-      console.log("Error while fetching", error);
+      console.error("Error while fetching", error);
+      set({ loading: false, hasMore: false });
       if (error instanceof Error) {
         set({ loading: false, error: error.message });
       } else {

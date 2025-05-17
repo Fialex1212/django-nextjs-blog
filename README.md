@@ -7,7 +7,7 @@ The Django & Next.js Blog is a modern platform built with Django for the backend
 Develop a modern blog platform using Django for the backend and Next.js for the frontend.
 
 ## **Features**
-- **User Authentication:** Users can register by email or Google Account, login, and manage their profiles.
+- **User Authentication:** Users can register by email, login, and manage their profiles.
 - **Blog Posts:** Create, edit, and delete posts.
 - **Comments System:** Users can leave comments and interact with posts.
 - **Search & Filtering:** Enable searching and filtering by all, users and posts.

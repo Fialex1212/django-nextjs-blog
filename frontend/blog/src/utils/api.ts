@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 
 const API_URL = "http://127.0.0.1:8000/api";
@@ -20,10 +20,10 @@ api.interceptors.response.use(
     // console.log("Refresh token:", useAuthStore.getState().refresh_token);
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Помечаем, что запрос уже пытались повторить
+      originalRequest._retry = true;
 
       try {
-        const authStore = useAuthStore.getState(); // <-- Получаем состояние хранилища правильно
+        const authStore = useAuthStore.getState();
         const refreshToken = authStore.refresh_token;
 
         if (!refreshToken) {
@@ -39,12 +39,11 @@ api.interceptors.response.use(
         authStore.rewriteToken(access);
         authStore.rewriteRefreshToken(refresh);
 
-        console.log("Updated token:", authStore.token);
-        console.log("Updated refresh token:", authStore.refresh_token);
-        
+        console.debug("Updated token:", authStore.token);
+        console.debug("Updated refresh token:", authStore.refresh_token);
+
         api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
         originalRequest.headers["Authorization"] = `Bearer ${access}`;
-        
 
         return api(originalRequest);
       } catch (refreshError) {
@@ -55,7 +54,7 @@ api.interceptors.response.use(
         setTimeout(() => {
           window.location.href = "/auth/login";
         }, 500);
-        
+
         return Promise.reject(refreshError);
       }
     }
@@ -66,13 +65,12 @@ api.interceptors.response.use(
 
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
-  console.log("📡 Using token in request:", token);
+  console.debug("📡 Using token in request:", token);
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
   }
   return config;
 });
-
 
 //handler for adding token to request
 api.interceptors.request.use((config) => {
@@ -99,7 +97,7 @@ export async function registerUser(
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || "Registration failed";
-      console.log(errorMessage);
+      console.error(errorMessage);
       toast.error("Registration failed");
     } else {
       toast.error("Registration failed");
@@ -118,7 +116,7 @@ export async function loginUser(username: string, password: string) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || "Invalid credentials";
-      console.log(errorMessage);
+      console.error(errorMessage);
       toast.error("Invalid credentials");
     } else {
       toast.error("Invalid credentials");
@@ -146,7 +144,7 @@ export async function getUser() {
     const res = await api.get(`/auth/me/`);
     return res.data;
   } catch (error) {
-    console.log("Failed to fetch user data", error);
+    console.error("Failed to fetch user data", error);
   }
 }
 
@@ -159,7 +157,7 @@ export async function getUserDetail(username: string) {
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error.response?.data?.error || "Failed to fetch user data";
-      console.log(errorMessage);
+      console.error(errorMessage);
       toast.error("Failed to fetch user data");
     } else {
       toast.error("Failed to fetch user data");
@@ -262,8 +260,6 @@ export async function updatePassword(
   newPassword: string,
   oldPassword: string
 ) {
-  console.log(newPassword, oldPassword);
-
   try {
     const res = await api.post(
       `/auth/update_password/`,
@@ -317,7 +313,7 @@ export async function uploadAvatar(token: string, formData: FormData) {
     });
     return res.data;
   } catch (error) {
-    console.log("Failed to update avatar", error);
+    console.error("Failed to update avatar", error);
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error?.response?.data?.error || "Failed to update avatar";
@@ -334,15 +330,18 @@ export async function uploadAvatar(token: string, formData: FormData) {
 export async function getPosts(limit = 10, page = 1) {
   try {
     const res = await api.get(`/posts/`, {
-      params: {
-        limit,
-        page,
-      },
+      params: { limit, page },
     });
-    console.log("Fetched posts:", res.data);
     return res.data;
-  } catch (error) {
-    console.error("Error fetching posts:", error);
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 404) {
+        return { results: [] };
+      }
+      console.error("Error fetching posts:", error);
+    } else {
+      console.error("Unexpected error:", error);
+    }
     return null;
   }
 }
@@ -351,7 +350,6 @@ export async function getPosts(limit = 10, page = 1) {
 export async function getPost(id: string) {
   try {
     const res = await api.get(`/posts/${id}/`, {});
-    console.log("Fetched posts:", res.data);
     return res.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -407,10 +405,14 @@ export async function updatePost(
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Error updating post:", error.response?.data || error.message);
+      console.error(
+        "Error updating post:",
+        error.response?.data || error.message
+      );
       throw error.response?.data || error.message;
     } else {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error updating post:", errorMessage);
       throw errorMessage;
     }
@@ -430,12 +432,16 @@ export async function deletePost(token: string, postId: string) {
     );
 
     return response.data;
-  }  catch (error: unknown) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Error updating post:", error.response?.data || error.message);
+      console.error(
+        "Error updating post:",
+        error.response?.data || error.message
+      );
       throw error.response?.data || error.message;
     } else {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error updating post:", errorMessage);
       throw errorMessage;
     }
@@ -460,13 +466,13 @@ export async function likePost(token: string, id: string) {
       const errorMessage =
         error.response?.data?.error || "Failed to like a post";
       if (error.response?.status === 401) {
-        console.log("Unauthorized! Please log in.");
+        console.error("Unauthorized! Please log in.");
         toast.error("Unauthorized! Please log in.");
       } else {
-        console.log(errorMessage);
+        console.error(errorMessage);
       }
     } else {
-      console.log("Failed to like a post", error);
+      console.error("Failed to like a post", error);
     }
   }
 }
@@ -487,7 +493,7 @@ export async function createComment(itemId: string, comment: string) {
     });
     return res.data;
   } catch (error) {
-    console.log("Failed to update avatar", error);
+    console.error("Failed to update avatar", error);
     if (axios.isAxiosError(error)) {
       const errorMessage =
         error?.response?.data?.error || "Failed to update avatar";
@@ -517,13 +523,13 @@ export async function likeComment(token: string, id: string) {
       const errorMessage =
         error.response?.data?.error || "Failed to like a post";
       if (error.response?.status === 401) {
-        console.log("Unauthorized! Please log in.");
+        console.error("Unauthorized! Please log in.");
         toast.error("Unauthorized! Please log in.");
       } else {
-        console.log(errorMessage);
+        console.error(errorMessage);
       }
     } else {
-      console.log("Failed to like a post", error);
+      console.error("Failed to like a post", error);
     }
   }
 }
@@ -541,10 +547,14 @@ export async function updateComment(token: string, id: string, data: FormData) {
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Error updating post:", error.response?.data || error.message);
+      console.error(
+        "Error updating post:",
+        error.response?.data || error.message
+      );
       throw error.response?.data || error.message;
     } else {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error updating post:", errorMessage);
       throw errorMessage;
     }
@@ -563,10 +573,14 @@ export async function deleteComment(token: string, id: string) {
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error("Error updating post:", error.response?.data || error.message);
+      console.error(
+        "Error updating post:",
+        error.response?.data || error.message
+      );
       throw error.response?.data || error.message;
     } else {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       console.error("Error updating post:", errorMessage);
       throw errorMessage;
     }
@@ -579,10 +593,10 @@ export async function deleteComment(token: string, id: string) {
 export async function searchQuery(query: string) {
   try {
     const response = await api.get(`/search/?search=${query}`, {});
-    console.log("API Response:", response.data);
+    console.debug("API Response:", response.data);
     return response.data;
   } catch (error) {
-    console.log("Failed to search", error);
+    console.error("Failed to search", error);
     throw error;
   }
 }

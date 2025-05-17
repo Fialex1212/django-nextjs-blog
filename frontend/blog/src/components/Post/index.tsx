@@ -148,6 +148,7 @@ const PostItem = ({ item }: { item: PostProps }) => {
               width={400}
               height={400}
               className="post-photo"
+              style={{ width: "400px", height: "auto" }}
             />
           )}
         </Link>
@@ -176,7 +177,7 @@ const PostItem = ({ item }: { item: PostProps }) => {
         <div className="post-text flex gap-[10px]">
           <p className="font-bold">{item.author.username}</p> <p>{item.text}</p>{" "}
         </div>
-        <div className="text-zinc-500">
+        <div className="text-balck">
           {item.comments.length === 0 ? (
             <p>No comments yet</p>
           ) : (
