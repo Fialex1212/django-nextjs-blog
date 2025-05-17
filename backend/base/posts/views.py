@@ -16,7 +16,7 @@ logger = logging.getLogger("posts")
 class PostPagination(PageNumberPagination):
     page_size = 3
     page_size_query_param = "limit"
-    max_page_size = 100
+    max_page_size = 10
 
 
 @extend_schema(tags=["Posts"])

@@ -19,7 +19,7 @@ export interface PostProps {
   author: UserProps;
   text: string;
   photo: string;
-  comments: Comment[];
+  comments: CommentProps[];
   created_at: string;
   count_likes: number;
   is_liked: boolean;

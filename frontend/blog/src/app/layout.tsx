@@ -18,6 +18,49 @@ export const metadata: Metadata = {
   description: "Blog app using Django&Next.js",
 };
 
+// export const metadata: Metadata = {
+//   metadataBase: new URL(siteMetadata.url),
+//   alternates: {
+//       canonical: '/',
+//   },
+//   verification: {
+//       google: siteMetadata.googleVerification,
+//   },
+//   title: siteMetadata.title,
+//   description: siteMetadata.description,
+//   openGraph: {
+//       url: siteMetadata.url,
+//       siteName: siteMetadata.name,
+//       locale: "uk_UA",
+//       type: "website",
+//       images: {
+//           url: siteMetadata.image.url,
+//           width: 500,
+//           height: 500,
+//           alt: siteMetadata.image.alt,
+//       },
+//   },
+//   robots: {
+//       index: true,
+//       follow: false,
+//       nocache: true,
+//       googleBot: {
+//           index: true,
+//           follow: false,
+//           noimageindex: true,
+//           "max-video-preview": -1,
+//           "max-image-preview": "large",
+//           "max-snippet": -1,
+//       },
+//   },
+//   twitter: {
+//       card: "summary_large_image",
+//       title: siteMetadata.title,
+//       description: siteMetadata.description,
+//       images: siteMetadata.image.url,
+//   },
+// };
+
 export default function RootLayout({
   children,
 }: Readonly<{

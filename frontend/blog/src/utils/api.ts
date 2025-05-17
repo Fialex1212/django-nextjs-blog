@@ -34,16 +34,17 @@ api.interceptors.response.use(
           refresh: refreshToken,
         });
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        const { access, refresh } = response.data;
 
-        authStore.rewriteToken(accessToken);
-        authStore.rewriteRefreshToken(newRefreshToken);
+        authStore.rewriteToken(access);
+        authStore.rewriteRefreshToken(refresh);
 
         console.log("Updated token:", authStore.token);
         console.log("Updated refresh token:", authStore.refresh_token);
-
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+        
+        api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+        originalRequest.headers["Authorization"] = `Bearer ${access}`;
+        
 
         return api(originalRequest);
       } catch (refreshError) {
@@ -51,7 +52,10 @@ api.interceptors.response.use(
         const authStore = useAuthStore.getState();
         authStore.logout();
 
-        window.location.href = "/auth/login";
+        setTimeout(() => {
+          window.location.href = "/auth/login";
+        }, 500);
+        
         return Promise.reject(refreshError);
       }
     }
@@ -59,6 +63,16 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  console.log("📡 Using token in request:", token);
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 
 //handler for adding token to request
 api.interceptors.request.use((config) => {
@@ -113,6 +127,18 @@ export async function loginUser(username: string, password: string) {
 }
 
 //USER
+
+export const loginWithGoogle = async (googleToken: string) => {
+  try {
+    const response = await axios.post("/api/auth/google", {
+      token: googleToken,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error during Google login:", error);
+    return null;
+  }
+};
 
 //GET ME
 export async function getUser() {
@@ -379,12 +405,15 @@ export async function updatePost(
     );
 
     return response.data;
-  } catch (error) {
-    console.error(
-      "Error updating post:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error.message;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error updating post:", error.response?.data || error.message);
+      throw error.response?.data || error.message;
+    } else {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Error updating post:", errorMessage);
+      throw errorMessage;
+    }
   }
 }
 
@@ -401,12 +430,15 @@ export async function deletePost(token: string, postId: string) {
     );
 
     return response.data;
-  } catch (error) {
-    console.error(
-      "Error deleting post:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error.message;
+  }  catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error updating post:", error.response?.data || error.message);
+      throw error.response?.data || error.message;
+    } else {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Error updating post:", errorMessage);
+      throw errorMessage;
+    }
   }
 }
 
@@ -499,46 +531,45 @@ export async function likeComment(token: string, id: string) {
 //UPDATE COMMENT
 export async function updateComment(token: string, id: string, data: FormData) {
   try {
-    const response = await axios.put(
-      `${API_URL}/comments/${id}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    const response = await axios.put(`${API_URL}/comments/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     return response.data;
-  } catch (error) {
-    console.error(
-      "Error updating post:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error.message;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error updating post:", error.response?.data || error.message);
+      throw error.response?.data || error.message;
+    } else {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Error updating post:", errorMessage);
+      throw errorMessage;
+    }
   }
 }
 
 //DELETE COMMENT
 export async function deleteComment(token: string, id: string) {
   try {
-    const response = await axios.delete(
-      `${API_URL}/comments/${id}/`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.delete(`${API_URL}/comments/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return response.data;
-  } catch (error) {
-    console.error(
-      "Error deleting post:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error.message;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error("Error updating post:", error.response?.data || error.message);
+      throw error.response?.data || error.message;
+    } else {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Error updating post:", errorMessage);
+      throw errorMessage;
+    }
   }
 }
 

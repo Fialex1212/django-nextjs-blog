@@ -1,17 +1,27 @@
 import re
+import logging
 from .models import CustomUser
 from django.http import Http404
+from django.conf import settings
 from rest_framework import status
 from rest_framework import filters
 from django.db import IntegrityError
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.contrib.auth import login
+from django.core.mail import send_mail
+from social_django.views import complete
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework.decorators import action
+from social_django.utils import load_strategy
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
+from social_core.exceptions import AuthException
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
+from social_core.backends.google import GoogleOAuth2
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer, UserSerializer, AvatarUpdateSerializer
@@ -20,6 +30,7 @@ from rest_framework_simplejwt.token_blacklist.models import (
     BlacklistedToken,
 )
 
+logger = logging.getLogger("users")
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -27,6 +38,20 @@ def get_tokens_for_user(user):
         "refresh": str(refresh),
         "access": str(refresh.access_token),
     }
+
+
+def send_email_custom(title: str, message: str, email: str):
+    try:
+        send_mail(
+            title,
+            message,
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
+        logger.info(f"Email sent to {email}")
+    except Exception as e:
+        logger.error(f"Failed to send email: {str(e)}")
 
 
 @extend_schema(tags=["Users"])
@@ -39,6 +64,8 @@ class AuthViewSet(ViewSet):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            print("Test")
+            send_email_custom("You have created an account!!!", "Thanks!!!", user.email)
             return Response(get_tokens_for_user(user), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -250,3 +277,35 @@ class AuthViewSet(ViewSet):
             )
 
         return Response(avatar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def google_login(request):
+    return redirect("/api/auth/login/google-oauth2/")
+
+
+
+def google_callback(request):
+    id_token = request.POST.get("token")
+    if not id_token:
+        return JsonResponse({"error": "No token provided"}, status=400)
+
+    try:
+        strategy = load_strategy(request)
+        backend = GoogleOAuth2(strategy=strategy)
+        user = backend.do_auth(id_token)
+
+        if not user:
+            return JsonResponse({"error": "Authentication failed"}, status=400)
+
+        login(request, user)
+        return JsonResponse({
+            "access_token": user.auth_token.key,
+            "user": {
+                "username": user.username,
+                "email": user.email,
+                "avatar": getattr(user, "avatar", None),
+            },
+        })
+    except AuthException as e:
+        return JsonResponse({"error": f"Invalid token: {str(e)}"}, status=400)
+

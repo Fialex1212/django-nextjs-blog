@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import type { FieldValues } from "react-hook-form";
 import Link from "next/link";
+import { useEffect } from "react";
 
 const Login = () => {
   const {
@@ -15,7 +16,17 @@ const Login = () => {
     reset,
   } = useForm();
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login, loginWithGoogle } = useAuthStore();
+
+  useEffect(() => {
+    // Проверяем, есть ли Google-токен в URL (после редиректа)
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleToken = urlParams.get("token");
+    if (googleToken) {
+      loginWithGoogle(googleToken);
+      window.history.replaceState(null, "", window.location.pathname); // Убираем токен из URL
+    }
+  }, [loginWithGoogle]);
 
   const onSubmit = async (data: FieldValues) => {
     console.log(data.username, data.password);
@@ -83,6 +94,15 @@ const Login = () => {
           disabled={isSubmitting}
         >
           Login
+        </button>
+        <button
+          className="cursor-pointer group relative flex justify-center gap-1.5 px-6 py-4 bg-black bg-opacity-95 text-[#f1f1f1] rounded-xl hover:bg-opacity-85 transition font-semibold shadow-md"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          <Link href="http://localhost:8000/api/auth/google/login/">
+            Войти через Google
+          </Link>
         </button>
         <div className="flex justify-center gap-[10px] font-semibold">
           <p>Do not have an account?</p>

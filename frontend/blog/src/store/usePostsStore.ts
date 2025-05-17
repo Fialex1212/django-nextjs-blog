@@ -7,6 +7,7 @@ interface PostState {
   loading: boolean;
   error: string | null;
   page: number;
+  hasMore: boolean;
   fetchPosts: () => Promise<void>;
   deletePostFromStore: (postId: string) => void;
 }
@@ -16,16 +17,22 @@ export const usePostsStore = create<PostState>((set) => ({
   loading: false,
   error: null,
   page: 1,
-  fetchPosts: async (limit: number = 100, page: number = 1) => {
+  hasMore: true,
+  fetchPosts: async (limit: number = 10) => {
+    const { page, hasMore } = usePostsStore.getState();
+    if (!hasMore) return;
     set({ loading: true, error: null });
     try {
       const postsData = await getPosts(limit, page);
+      const newPosts = postsData?.results ?? [];
       console.log("Posts data in store:", postsData);
+
       if (postsData && postsData.results) {
-        set(() => ({
-          posts: postsData.results,
+        set((state) => ({
+          posts: [...state.posts, ...newPosts],
           loading: false,
-          page: page + 1,
+          page: state.page + 1,
+          hasMore: newPosts.length === limit,
         }));
       } else {
         set({ loading: false });

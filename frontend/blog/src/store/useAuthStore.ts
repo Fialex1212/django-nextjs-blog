@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import Cookies from "js-cookie";
-import { getUser } from "../utils/api";
+import { getUser, loginWithGoogle } from "../utils/api";
 import { UserProps } from "@/types";
 
 interface AuthState {
@@ -13,6 +13,7 @@ interface AuthState {
   login: (token: string, refresh_token: string, user: UserProps) => void;
   logout: () => void;
   loadUser: () => Promise<void>;
+  loginWithGoogle: (googleToken: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -61,6 +62,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       Cookies.remove("accessToken");
       set({ token: null, user: null, loading: false });
       console.log("Error handled, loading false");
+    }
+  },
+  loginWithGoogle: async (googleToken) => {
+    try {
+      const response = await loginWithGoogle(googleToken);
+      if (!response) throw new Error("Google login failed");
+      const { access, refresh, user } = response;
+
+      Cookies.set("accessToken", access, { expires: 7 });
+      Cookies.set("refreshToken", refresh, { expires: 7 });
+
+      set({ token: access, refresh_token: refresh, user, loading: false });
+      console.log("Auth store:", useAuthStore.getState());
+    } catch (error) {
+      console.error("Google login failed:", error);
+      set({ token: null, user: null, loading: false });
     }
   },
 }));

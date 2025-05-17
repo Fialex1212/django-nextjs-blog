@@ -9,21 +9,18 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path(
-        "api/schema/", SpectacularAPIView.as_view(), name="schema"
-    ),  # Генерация OpenAPI схемы
-    path(
-        "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
-    ),  # Swagger UI
-    path(
-        "api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
-    ),  # ReDoc UI (если нужно)
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("admin/", admin.site.urls),
     path("api/", include("users.urls")),
     path("api/", include("search.urls")),
     path("api/", include("comments.urls")),
     path("api/", include("posts.urls")),
-    path("auth/", include("social_django.urls", namespace="social")),
+    path("api/auth/", include("social_django.urls", namespace="social")),
+    path("oauth/", include("oauth2_provider.urls", namespace="oauth2_provider")),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

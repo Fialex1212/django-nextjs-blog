@@ -1,11 +1,11 @@
-"use client";
-
+// app/(frontend)/profile/[username]/page.tsx (Server Component)
 import ProfileByUsername from "@/components/Profile/ProfileByUsername";
 
-export default function ProfilePageByUsername({
+export default async function ProfilePageByUsername({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
-  return <ProfileByUsername username={params.username} />;
+  const { username } = await params;
+  return <ProfileByUsername username={username} />;
 }
